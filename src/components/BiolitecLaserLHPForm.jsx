@@ -7,7 +7,9 @@ import {
   Activity,
   FileText,
   Plus,
-  Trash2
+  Trash2,
+  Calendar
+
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { addSurgery } from '../redux/SurgerySlice';
@@ -73,7 +75,19 @@ const BiolitecLaserLHPForm = () => {
     itching: '',
     bleeding: '',
     soiling: '',
-    prolapsing: ''
+    prolapsing: '',
+
+    vasScore: '',
+    followUp: {
+      twoWeeks: { completed: false, date: '', notes: '' },
+      sixWeeks: { completed: false, date: '', notes: '' },
+      threeMonths: { completed: false, date: '', notes: '' },
+      sixMonths: { completed: false, date: '', notes: '' },
+      twelveMonths: { completed: false, date: '', notes: '' },
+      twoYears: { completed: false, date: '', notes: '' },
+      threeYears: { completed: false, date: '', notes: '' },
+      fiveYears: { completed: false, date: '', notes: '' }
+    }
   });
 
   const navigate = useNavigate();
@@ -135,6 +149,19 @@ const BiolitecLaserLHPForm = () => {
     }));
   };
 
+  const handleFollowUpChange = (period, field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      followUp: {
+        ...prev.followUp,
+        [period]: {
+          ...prev.followUp[period],
+          [field]: value
+        }
+      }
+    }));
+  };
+
   const calculateTotalEnergy = () => {
     return formData.intraOperativeData.reduce((total, item) => {
       return total + (parseFloat(item.energy) || 0);
@@ -169,6 +196,18 @@ const BiolitecLaserLHPForm = () => {
     console.log('Saving draft:', formData);
     alert('Draft saved successfully!');
   };
+  const followUpPeriods = [
+    { key: 'twoWeeks', label: '2 Weeks' },
+    { key: 'sixWeeks', label: '6 Weeks' },
+    { key: 'threeMonths', label: '3 Months' },
+    { key: 'sixMonths', label: '6 Months' },
+    { key: 'twelveMonths', label: '12 Months' },
+    { key: 'twoYears', label: '2 Years' },
+    { key: 'threeYears', label: '3 Years' },
+    { key: 'fiveYears', label: '5 Years' }
+  ];
+
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -215,7 +254,7 @@ const BiolitecLaserLHPForm = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                 Country
+                  Country
                 </label>
                 <input
                   type="text"
@@ -401,6 +440,101 @@ const BiolitecLaserLHPForm = () => {
               </table>
             </div>
           </div>
+          {/* Section 3: VAS Score */}
+          <div className="pt-6 border-t border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
+              <Activity className="w-6 h-6 text-cyan-600" />
+              <span>VAS Score (Pain Assessment)</span>
+            </h2>
+            <div className="bg-gradient-to-r from-green-50 via-yellow-50 to-red-50 p-6 rounded-xl border-2 border-gray-200">
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  Visual Analog Scale (0-10)
+                </label>
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max="10"
+                    value={formData.vasScore}
+                    onChange={(e) => handleInputChange('vasScore', e.target.value)}
+                    className="flex-1 h-3 bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #10b981 0%, #fbbf24 50%, #ef4444 100%)`
+                    }}
+                  />
+                  <div className="w-20 text-center">
+                    <span className="text-3xl font-bold text-gray-900">{formData.vasScore || 0}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600 mt-2">
+                <span className="font-semibold text-green-600">0 - No Pain</span>
+                <span className="font-semibold text-yellow-600">5 - Moderate</span>
+                <span className="font-semibold text-red-600">10 - Worst Pain</span>
+              </div>
+            </div>
+          </div>
+          {/* Section 10: Follow-Up Schedule */}
+          <div className="pt-6 border-t border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
+              <Calendar className="w-6 h-6 text-cyan-600" />
+              <span>Follow-Up </span>
+            </h2>
+            <div className="space-y-4">
+              {followUpPeriods.map((period) => (
+                <div key={period.key} className="p-5 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        checked={formData.followUp[period.key].completed}
+                        onChange={(e) => handleFollowUpChange(period.key, 'completed', e.target.checked)}
+                        className="w-5 h-5 text-cyan-600 rounded focus:ring-cyan-500"
+                      />
+                      <label className="text-sm font-semibold text-gray-900">
+                        {period.label} Follow-Up
+                      </label>
+                    </div>
+                    {formData.followUp[period.key].completed && (
+                      <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                        Completed
+                      </span>
+                    )}
+                  </div>
+
+                  {formData.followUp[period.key].completed && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Follow-Up Date
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.followUp[period.key].date}
+                          onChange={(e) => handleFollowUpChange(period.key, 'date', e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Notes
+                        </label>
+                        <textarea
+                          value={formData.followUp[period.key].notes}
+                          onChange={(e) => handleFollowUpChange(period.key, 'notes', e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                          rows="2"
+                          placeholder="Enter follow-up notes or observations"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
 
           {/* Section 4: Additional Differential Diagnostics */}
           <div className="pt-6 border-t border-gray-200">

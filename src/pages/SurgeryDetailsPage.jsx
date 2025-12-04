@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Calendar, 
-  Clock, 
-  User, 
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  User,
   FileText,
   Activity,
   Download,
@@ -50,7 +50,7 @@ const SurgeryDetailsPage = () => {
       ...prev,
       formData: {
         ...prev.formData,
-        intraOperativeData: prev.formData.intraOperativeData.map((item, i) => 
+        intraOperativeData: prev.formData.intraOperativeData.map((item, i) =>
           i === index ? { ...item, [field]: value } : item
         )
       }
@@ -72,13 +72,28 @@ const SurgeryDetailsPage = () => {
       }
     }));
   };
+  const handleFollowUpChange = (period, field, value) => {
+    setEditedData(prev => ({
+      ...prev,
+      formData: {
+        ...prev.formData,
+        followUp: {
+          ...prev.formData.followUp,
+          [period]: {
+            ...prev.formData.followUp[period],
+            [field]: value
+          }
+        }
+      }
+    }));
+  };
 
   // Save edited data
   const handleSave = () => {
     // Dispatch action to update surgery record in Redux
-    dispatch({ 
-      type: 'UPDATE_SURGERY', 
-      payload: editedData 
+    dispatch({
+      type: 'UPDATE_SURGERY',
+      payload: editedData
     });
     setIsEditMode(false);
     alert('Surgery record updated successfully!');
@@ -141,7 +156,7 @@ const SurgeryDetailsPage = () => {
     doc.text(surgeryRecord.procedure, pageWidth / 2, 25, { align: 'center' });
     doc.setFontSize(10);
     doc.text(`Record ID: ${surgeryRecord.id}`, pageWidth / 2, 33, { align: 'center' });
-    
+
     doc.setTextColor(0, 0, 0);
     yPosition = 50;
 
@@ -156,6 +171,49 @@ const SurgeryDetailsPage = () => {
     yPosition = addText(`Duration: ${surgeryRecord.duration}  |  Status: ${surgeryRecord.status}`, margin, yPosition);
     yPosition += 5;
 
+    if (surgeryRecord.formData.vasScore !== undefined) {
+      addSectionHeader('VAS SCORE (PAIN ASSESSMENT)');
+      yPosition = addText(`Visual Analog Scale: ${surgeryRecord.formData.vasScore}/10`, margin, yPosition, 10, true);
+      let painLevel = 'No Pain';
+      if (surgeryRecord.formData.vasScore >= 7) painLevel = 'Severe Pain';
+      else if (surgeryRecord.formData.vasScore >= 4) painLevel = 'Moderate Pain';
+      else if (surgeryRecord.formData.vasScore >= 1) painLevel = 'Mild Pain';
+      yPosition = addText(`Pain Level: ${painLevel}`, margin, yPosition);
+      yPosition += 5;
+    }
+
+    // Follow-Up Schedule
+    if (surgeryRecord.formData.followUp) {
+      addSectionHeader('FOLLOW-UP SCHEDULE');
+      const followUpPeriods = [
+        { key: 'twoWeeks', label: '2 Weeks' },
+        { key: 'sixWeeks', label: '6 Weeks' },
+        { key: 'threeMonths', label: '3 Months' },
+        { key: 'sixMonths', label: '6 Months' },
+        { key: 'twelveMonths', label: '12 Months' },
+        { key: 'twoYears', label: '2 Years' },
+        { key: 'threeYears', label: '3 Years' },
+        { key: 'fiveYears', label: '5 Years' }
+      ];
+
+      followUpPeriods.forEach(period => {
+        const followUp = surgeryRecord.formData.followUp[period.key];
+        if (followUp && followUp.completed) {
+          checkPageBreak();
+          yPosition = addText(`${period.label} Follow-Up:`, margin, yPosition, 10, true);
+          yPosition = addText(`  Date: ${followUp.date || 'Not recorded'}`, margin, yPosition);
+          if (followUp.notes) {
+            yPosition = addText(`  Notes: ${followUp.notes}`, margin, yPosition);
+          }
+          yPosition += 3;
+        }
+      });
+
+      const completedCount = followUpPeriods.filter(p =>
+        surgeryRecord.formData.followUp[p.key]?.completed
+      ).length;
+      yPosition = addText(`Follow-Up Progress: ${completedCount}/${followUpPeriods.length} completed`, margin, yPosition, 10, true);
+    }
     // Laser Settings (if Laser Surgery)
     if (surgeryRecord.type === 'Laser Surgery') {
       addSectionHeader('LASER SETTINGS');
@@ -240,12 +298,14 @@ const SurgeryDetailsPage = () => {
     const { type, formData } = isEditMode ? editedData : surgeryRecord;
 
     if (type === 'Laser Surgery') {
-      return <LaserSurgeryDetails 
-        formData={formData} 
+      return <LaserSurgeryDetails
+        formData={formData}
         isEditMode={isEditMode}
         onFieldChange={handleFormDataChange}
         onIntraOpChange={handleIntraOpDataChange}
         onDiagnosticChange={handleDiagnosticChange}
+        onFollowUpChange={handleFollowUpChange}
+
       />;
     } else if (type === 'Cardiac Surgery') {
       return <CardiacSurgeryDetails formData={formData} />;
@@ -274,9 +334,9 @@ const SurgeryDetailsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
-        
+
         {/* Back Button */}
-        <button 
+        <button
           onClick={() => navigate(-1)}
           className="flex items-center space-x-2 text-gray-600 hover:text-cyan-600 transition mb-6"
         >
@@ -298,16 +358,16 @@ const SurgeryDetailsPage = () => {
             <div className="flex space-x-2">
               {!isEditMode ? (
                 <>
-                  <button 
+                  <button
                     onClick={handleDownloadPDF}
-                    className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition" 
+                    className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
                     title="Download PDF"
                   >
                     <Download className="w-5 h-5 text-gray-600" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => setIsEditMode(true)}
-                    className="p-3 border border-cyan-600 text-cyan-600 rounded-lg hover:bg-cyan-50 transition" 
+                    className="p-3 border border-cyan-600 text-cyan-600 rounded-lg hover:bg-cyan-50 transition"
                     title="Edit"
                   >
                     <Edit className="w-5 h-5" />
@@ -321,17 +381,17 @@ const SurgeryDetailsPage = () => {
                 </>
               ) : (
                 <>
-                  <button 
+                  <button
                     onClick={handleSave}
-                    className="px-4 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition flex items-center space-x-2" 
+                    className="px-4 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition flex items-center space-x-2"
                     title="Save"
                   >
                     <Save className="w-5 h-5" />
                     <span>Save</span>
                   </button>
-                  <button 
+                  <button
                     onClick={handleCancel}
-                    className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition" 
+                    className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
                     title="Cancel"
                   >
                     <X className="w-5 h-5 text-gray-600" />
@@ -348,7 +408,7 @@ const SurgeryDetailsPage = () => {
               <div className="flex-1">
                 <p className="text-sm text-gray-500">Patient</p>
                 {isEditMode ? (
-                  <input 
+                  <input
                     type="text"
                     value={currentData.patientName}
                     onChange={(e) => handleFieldChange('patientName', e.target.value)}
@@ -376,7 +436,7 @@ const SurgeryDetailsPage = () => {
               <div>
                 <p className="text-sm text-gray-500">Date & Time</p>
                 {isEditMode ? (
-                  <input 
+                  <input
                     type="date"
                     value={currentData.date}
                     onChange={(e) => handleFieldChange('date', e.target.value)}
@@ -424,10 +484,187 @@ const SurgeryDetailsPage = () => {
 // ============================================
 
 // Laser Surgery Details Component
-const LaserSurgeryDetails = ({ formData, isEditMode, onFieldChange, onIntraOpChange, onDiagnosticChange }) => {
+const LaserSurgeryDetails = ({ formData, isEditMode, onFieldChange, onIntraOpChange, onDiagnosticChange, onFollowUpChange
+}) => {
+  const followUpPeriods = [
+    { key: 'twoWeeks', label: '2 Weeks' },
+    { key: 'sixWeeks', label: '6 Weeks' },
+    { key: 'threeMonths', label: '3 Months' },
+    { key: 'sixMonths', label: '6 Months' },
+    { key: 'twelveMonths', label: '12 Months' },
+    { key: 'twoYears', label: '2 Years' },
+    { key: 'threeYears', label: '3 Years' },
+    { key: 'fiveYears', label: '5 Years' }
+  ];
+
   return (
     <div className="space-y-6">
-      
+      {/* VAS Score Section - Add after Laser Settings */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
+          <Activity className="w-6 h-6 text-cyan-600" />
+          <span>VAS Score (Pain Assessment)</span>
+        </h2>
+        <div className="bg-gradient-to-r from-green-50 via-yellow-50 to-red-50 p-6 rounded-xl border-2 border-gray-200">
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-3">
+              Visual Analog Scale (0-10)
+            </label>
+            {isEditMode ? (
+              <div className="flex items-center space-x-4">
+                <input
+                  type="range"
+                  min="0"
+                  max="10"
+                  value={formData.vasScore || 0}
+                  onChange={(e) => onFieldChange('vasScore', e.target.value)}
+                  className="flex-1 h-3 rounded-lg cursor-pointer"
+                />
+                <input
+                  type="number"
+                  min="0"
+                  max="10"
+                  value={formData.vasScore || 0}
+                  onChange={(e) => onFieldChange('vasScore', e.target.value)}
+                  className="w-20 text-center text-2xl font-bold text-gray-900 border-2 border-gray-300 rounded-lg px-2 py-1"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <div className="flex-1 h-3 bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 rounded-lg relative">
+                  <div
+                    className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white border-4 border-cyan-600 rounded-full shadow-lg"
+                    style={{ left: `${(formData.vasScore || 0) * 10}%`, transform: 'translate(-50%, -50%)' }}
+                  ></div>
+                </div>
+                <div className="w-20 text-center">
+                  <span className="text-3xl font-bold text-gray-900">{formData.vasScore || 0}</span>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-between text-sm text-gray-600 mt-2">
+            <span className="font-semibold text-green-600">0 - No Pain</span>
+            <span className="font-semibold text-yellow-600">5 - Moderate</span>
+            <span className="font-semibold text-red-600">10 - Worst Pain</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ... existing sections (Laser Settings, Diagnostics, etc.) ... */}
+
+      {/* Follow-Up Schedule Section - Add at the end */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
+          <Calendar className="w-6 h-6 text-cyan-600" />
+          <span>Follow-Up Schedule</span>
+        </h2>
+        <div className="space-y-4">
+          {followUpPeriods.map((period) => {
+            const followUpData = formData?.followUp?.[period.key] || { completed: false, date: '', notes: '' };
+
+            return (
+              <div
+                key={period.key}
+                className={`p-5 rounded-lg border-2 transition ${followUpData.completed
+                    ? 'bg-green-50 border-green-200'
+                    : 'bg-gray-50 border-gray-200'
+                  }`}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    {isEditMode ? (
+                      <input
+                        type="checkbox"
+                        checked={followUpData.completed}
+                        onChange={(e) => onFollowUpChange(period.key, 'completed', e.target.checked)}
+                        className="w-5 h-5 text-cyan-600 rounded focus:ring-cyan-500"
+                      />
+                    ) : (
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center ${followUpData.completed ? 'bg-green-500' : 'bg-gray-300'
+                        }`}>
+                        {followUpData.completed && (
+                          <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    )}
+                    <label className="text-lg font-semibold text-gray-900">
+                      {period.label} Follow-Up
+                    </label>
+                  </div>
+                  {followUpData.completed && !isEditMode && (
+                    <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                      Completed
+                    </span>
+                  )}
+                </div>
+
+                {followUpData.completed && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pl-8">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Follow-Up Date
+                      </label>
+                      {isEditMode ? (
+                        <input
+                          type="date"
+                          value={followUpData.date || ''}
+                          onChange={(e) => onFollowUpChange(period.key, 'date', e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                        />
+                      ) : (
+                        <p className="text-gray-900 font-medium">
+                          {followUpData.date ? new Date(followUpData.date).toLocaleDateString() : 'Not set'}
+                        </p>
+                      )}
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Notes
+                      </label>
+                      {isEditMode ? (
+                        <textarea
+                          value={followUpData.notes || ''}
+                          onChange={(e) => onFollowUpChange(period.key, 'notes', e.target.value)}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500"
+                          rows="2"
+                          placeholder="Enter follow-up notes or observations"
+                        />
+                      ) : (
+                        <p className="text-gray-700 leading-relaxed">
+                          {followUpData.notes || 'No notes recorded'}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Follow-Up Summary */}
+        <div className="mt-6 p-4 bg-cyan-50 rounded-lg border border-cyan-200">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-gray-700">Follow-Up Progress:</span>
+            <span className="text-lg font-bold text-cyan-600">
+              {followUpPeriods.filter(p => formData.followUp?.[p.key]?.completed).length} / {followUpPeriods.length} Completed
+            </span>
+          </div>
+          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-cyan-600 h-2 rounded-full transition-all duration-300"
+              style={{
+                width: `${(followUpPeriods.filter(p => formData.followUp?.[p.key]?.completed).length / followUpPeriods.length) * 100}%`
+              }}
+            ></div>
+          </div>
+        </div>
+      </div>
+
+
       {/* Laser Settings */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
@@ -435,36 +672,36 @@ const LaserSurgeryDetails = ({ formData, isEditMode, onFieldChange, onIntraOpCha
           <span>Laser Settings</span>
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <EditableDetailItem 
-            label="Laser Wavelength" 
-            value={formData.laserWavelength} 
+          <EditableDetailItem
+            label="Laser Wavelength"
+            value={formData.laserWavelength}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('laserWavelength', val)}
           />
-          <EditableDetailItem 
-            label="Laser Power" 
-            value={formData.laserPower} 
+          <EditableDetailItem
+            label="Laser Power"
+            value={formData.laserPower}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('laserPower', val)}
           />
-          <EditableDetailItem 
-            label="Pulse Mode" 
-            value={formData.laserPulseMode} 
+          <EditableDetailItem
+            label="Pulse Mode"
+            value={formData.laserPulseMode}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('laserPulseMode', val)}
           />
-          <EditableDetailItem 
-            label="Total Energy Applied" 
-            value={`${formData.totalAppliedEnergy}`} 
+          <EditableDetailItem
+            label="Total Energy Applied"
+            value={`${formData.totalAppliedEnergy}`}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('totalAppliedEnergy', val.replace(' J', ''))}
             suffix=" J"
           />
         </div>
         <div className="mt-6">
-          <EditableDetailItem 
-            label="Medication" 
-            value={formData.medication} 
+          <EditableDetailItem
+            label="Medication"
+            value={formData.medication}
             fullWidth
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('medication', val)}
@@ -483,7 +720,7 @@ const LaserSurgeryDetails = ({ formData, isEditMode, onFieldChange, onIntraOpCha
               {isEditMode ? (
                 <div className="space-y-2">
                   <label className="flex items-center space-x-2">
-                    <input 
+                    <input
                       type="checkbox"
                       checked={value.observed}
                       onChange={(e) => onDiagnosticChange(key, 'observed', e.target.checked)}
@@ -492,7 +729,7 @@ const LaserSurgeryDetails = ({ formData, isEditMode, onFieldChange, onIntraOpCha
                     <span className="text-sm">Observed</span>
                   </label>
                   <label className="flex items-center space-x-2">
-                    <input 
+                    <input
                       type="checkbox"
                       checked={value.treated}
                       onChange={(e) => onDiagnosticChange(key, 'treated', e.target.checked)}
@@ -516,25 +753,27 @@ const LaserSurgeryDetails = ({ formData, isEditMode, onFieldChange, onIntraOpCha
         </div>
       </div>
 
+
+
       {/* Anaesthesia */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Anaesthesia Details</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <EditableAnaesthesiaItem 
-            label="General" 
-            value={formData.generalAnaesthesia} 
+          <EditableAnaesthesiaItem
+            label="General"
+            value={formData.generalAnaesthesia}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('generalAnaesthesia', val)}
           />
-          <EditableAnaesthesiaItem 
-            label="Regional" 
-            value={formData.regionalAnaesthesia} 
+          <EditableAnaesthesiaItem
+            label="Regional"
+            value={formData.regionalAnaesthesia}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('regionalAnaesthesia', val)}
           />
-          <EditableAnaesthesiaItem 
-            label="Local" 
-            value={formData.localAnaesthesia} 
+          <EditableAnaesthesiaItem
+            label="Local"
+            value={formData.localAnaesthesia}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('localAnaesthesia', val)}
           />
@@ -558,7 +797,7 @@ const LaserSurgeryDetails = ({ formData, isEditMode, onFieldChange, onIntraOpCha
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {isEditMode ? (
-                      <input 
+                      <input
                         type="text"
                         value={item.position}
                         onChange={(e) => onIntraOpChange(index, 'position', e.target.value)}
@@ -570,7 +809,7 @@ const LaserSurgeryDetails = ({ formData, isEditMode, onFieldChange, onIntraOpCha
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900">
                     {isEditMode ? (
-                      <input 
+                      <input
                         type="text"
                         value={item.grade}
                         onChange={(e) => onIntraOpChange(index, 'grade', e.target.value)}
@@ -582,7 +821,7 @@ const LaserSurgeryDetails = ({ formData, isEditMode, onFieldChange, onIntraOpCha
                   </td>
                   <td className="px-4 py-3 text-sm font-semibold text-cyan-600">
                     {isEditMode ? (
-                      <input 
+                      <input
                         type="number"
                         value={item.energy}
                         onChange={(e) => onIntraOpChange(index, 'energy', e.target.value)}
@@ -609,33 +848,33 @@ const LaserSurgeryDetails = ({ formData, isEditMode, onFieldChange, onIntraOpCha
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <h2 className="text-xl font-bold text-gray-900 mb-6">Clinical Presentation - Need for Surgery</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <EditableSymptomItem 
-            label="Pain" 
-            value={formData.pain} 
+          <EditableSymptomItem
+            label="Pain"
+            value={formData.pain}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('pain', val)}
           />
-          <EditableSymptomItem 
-            label="Itching" 
-            value={formData.itching} 
+          <EditableSymptomItem
+            label="Itching"
+            value={formData.itching}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('itching', val)}
           />
-          <EditableSymptomItem 
-            label="Bleeding" 
-            value={formData.bleeding} 
+          <EditableSymptomItem
+            label="Bleeding"
+            value={formData.bleeding}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('bleeding', val)}
           />
-          <EditableSymptomItem 
-            label="Soiling" 
-            value={formData.soiling} 
+          <EditableSymptomItem
+            label="Soiling"
+            value={formData.soiling}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('soiling', val)}
           />
-          <EditableSymptomItem 
-            label="Prolapsing" 
-            value={formData.prolapsing} 
+          <EditableSymptomItem
+            label="Prolapsing"
+            value={formData.prolapsing}
             isEditMode={isEditMode}
             onChange={(val) => onFieldChange('prolapsing', val)}
           />
@@ -646,7 +885,7 @@ const LaserSurgeryDetails = ({ formData, isEditMode, onFieldChange, onIntraOpCha
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Postoperative Medication</h2>
         {isEditMode ? (
-          <textarea 
+          <textarea
             value={formData.postoperativeMedication}
             onChange={(e) => onFieldChange('postoperativeMedication', e.target.value)}
             className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 leading-relaxed"
@@ -700,14 +939,14 @@ const EditableDetailItem = ({ label, value, fullWidth, isEditMode, onChange, tex
     <p className="text-sm text-gray-500 mb-1">{label}</p>
     {isEditMode ? (
       textarea ? (
-        <textarea 
+        <textarea
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="font-semibold text-gray-900 border border-gray-300 rounded px-2 py-1 w-full"
           rows="2"
         />
       ) : (
-        <input 
+        <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -726,7 +965,7 @@ const EditableAnaesthesiaItem = ({ label, value, isEditMode, onChange }) => (
     <div className="flex-1">
       <p className="text-sm text-gray-500">{label} Anaesthesia</p>
       {isEditMode ? (
-        <select 
+        <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="font-semibold text-gray-900 border border-gray-300 rounded px-2 py-1 w-full mt-1"
@@ -763,7 +1002,7 @@ const EditableSymptomItem = ({ label, value, isEditMode, onChange }) => {
     <div className={`p-4 rounded-lg border ${getColor(value)}`}>
       <p className="text-sm font-semibold mb-1">{label}</p>
       {isEditMode ? (
-        <select 
+        <select
           value={value}
           onChange={(e) => onChange(e.target.value)}
           className="text-sm border border-gray-300 rounded px-2 py-1 w-full mt-1 bg-white"
