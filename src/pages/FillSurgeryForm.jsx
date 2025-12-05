@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import BiolitecLaserLHPForm from '../components/BiolitecLaserLHPForm';
+import BiolitecLaserLHPForm from '../components/LHPSurgeryForm/BiolitecLaserLHPForm';
+// import BiolitecLaserLHPForm from '../components/BiolitecLaserLHPForm';
 
 const FillSurgeryForm = () => {
   const { surgeryType } = useParams();

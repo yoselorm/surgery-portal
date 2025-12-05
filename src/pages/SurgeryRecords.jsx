@@ -35,8 +35,8 @@ const SurgeryRecords = () => {
       dispatch(deleteSurgery(id));
     }
   };
-  
- 
+
+
   const records = useSelector((state) => state.surgeries.list);
 
   const handleExport = () => {
@@ -44,19 +44,19 @@ const SurgeryRecords = () => {
   };
 
   const filteredRecords = records
-  ?.filter((r) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      r.id.toLowerCase().includes(term) ||
-      r.patientName.toLowerCase().includes(term) ||
-      r.procedure.toLowerCase().includes(term)
+    ?.filter((r) => {
+      const term = searchTerm.toLowerCase();
+      return (
+        r.id.toLowerCase().includes(term) ||
+        r.patientName.toLowerCase().includes(term) ||
+        r.procedure.toLowerCase().includes(term)
+      );
+    })
+    .filter((r) =>
+      filterStatus === "all"
+        ? true
+        : r.status.toLowerCase() === filterStatus.toLowerCase()
     );
-  })
-  .filter((r) =>
-    filterStatus === "all"
-      ? true
-      : r.status.toLowerCase() === filterStatus.toLowerCase()
-  );
 
 
   const getStatusBadge = (status, color) => {
@@ -128,9 +128,9 @@ const SurgeryRecords = () => {
 
           {/* Export Button */}
           <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-            <Download 
-            onClick={handleExport}
-            className="w-4 h-4" />
+            <Download
+              onClick={handleExport}
+              className="w-4 h-4" />
             <span>Export</span>
           </button>
         </div>
@@ -154,9 +154,9 @@ const SurgeryRecords = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                {/* <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Doctor
-                </th>
+                </th> */}
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Date & Time
                 </th>
@@ -187,9 +187,9 @@ const SurgeryRecords = () => {
                   <td className="px-6 py-4">
                     <span className="text-sm text-gray-700">{record.type}</span>
                   </td>
-                  <td className="px-6 py-4">
+                  {/* <td className="px-6 py-4">
                     <span className="text-sm text-gray-700">{record.doctor}</span>
-                  </td>
+                  </td> */}
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2 text-sm text-gray-700">
                       <Calendar className="w-4 h-4 text-gray-400" />
@@ -225,7 +225,7 @@ const SurgeryRecords = () => {
                 </tr>
               ))}
 
-{filteredRecords?.length === 0 && (
+              {filteredRecords?.length === 0 && (
                 <tr>
                   <td
                     colSpan="7"
@@ -264,7 +264,7 @@ const SurgeryRecords = () => {
         </div>
       </div>
 
-      
+
     </div>
   );
 };

@@ -1020,51 +1020,7 @@ const EditableSymptomItem = ({ label, value, isEditMode, onChange }) => {
   );
 };
 
-// ============================================
-// Original Helper Components (View Only)
-// ============================================
 
-const DetailItem = ({ label, value, fullWidth }) => (
-  <div className={fullWidth ? 'col-span-full' : ''}>
-    <p className="text-sm text-gray-500 mb-1">{label}</p>
-    <p className="font-semibold text-gray-900">{value || 'N/A'}</p>
-  </div>
-);
 
-const AnaesthesiaItem = ({ label, value }) => (
-  <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
-    <div className={`w-3 h-3 rounded-full ${value === 'yes' ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-    <div>
-      <p className="text-sm text-gray-500">{label} Anaesthesia</p>
-      <p className="font-semibold text-gray-900">{value === 'yes' ? 'Yes' : 'No'}</p>
-    </div>
-  </div>
-);
-
-const SymptomItem = ({ label, value }) => {
-  const formatValue = (val) => {
-    const mapping = {
-      'never': 'Never',
-      'less_than_once_month': 'Less than once a month',
-      'less_than_once_week': 'Less than once a week',
-      '1_6_days_per_week': '1-6 days per week',
-      'every_day': 'Every day (always)'
-    };
-    return mapping[val] || 'Not recorded';
-  };
-
-  const getColor = (val) => {
-    if (val === 'never') return 'text-green-600 bg-green-50';
-    if (val === 'every_day') return 'text-red-600 bg-red-50';
-    return 'text-amber-600 bg-amber-50';
-  };
-
-  return (
-    <div className={`p-4 rounded-lg border ${getColor(value)}`}>
-      <p className="text-sm font-semibold mb-1">{label}</p>
-      <p className="text-sm">{formatValue(value)}</p>
-    </div>
-  );
-};
 
 export default SurgeryDetailsPage;

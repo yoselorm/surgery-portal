@@ -1,0 +1,67 @@
+import React from 'react';
+import { User } from 'lucide-react';
+
+const DoctorInfoSection = ({ formData, onInputChange }) => {
+  return (
+    <div>
+      {/* <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
+        <User className="w-6 h-6 text-cyan-600" />
+        <span>Doctor Information</span>
+      </h2> */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Doctor Name
+          </label>
+          <input
+            type="text"
+            value={formData.doctorName}
+            onChange={(e) => onInputChange('doctorName', e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+            placeholder="Enter doctor name"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Country
+          </label>
+          <input
+            type="text"
+            value={formData.location}
+            onChange={(e) => onInputChange('location', e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+            placeholder="Enter location"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            City
+          </label>
+          <input
+            type="text"
+            value={formData.city}
+            onChange={(e) => onInputChange('city', e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+            placeholder="Enter city"
+          />
+        </div> */}
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Date of Surgery
+          </label>
+          <input
+            type="date"
+            value={formData.date}
+            onChange={(e) => onInputChange('date', e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default DoctorInfoSection;

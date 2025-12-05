@@ -95,8 +95,8 @@ const SurgeryTypeModal = ({ isOpen, onClose, onSelectSurgery }) => {
     },
     {
       id: 7,
-      name: 'Biolitec Laser LHP Treatment',
-      fullName: 'Biolitec Laser Hemorrhoid Procedure',
+      name: 'LHP Treatment',
+      fullName: 'Laser Hemorrhoid Procedure',
       icon: Activity,
       color: 'cyan',
       description: 'Laser hemorrhoid procedure treatment',
