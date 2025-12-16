@@ -1,28 +1,36 @@
 import React from 'react';
-import { 
-  Home, 
-  FileText, 
+import {
+  Home,
+  FileText,
   Activity,
   ChevronLeft,
   ChevronRight,
   LogOut
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutUser } from '../redux/AuthSlice';
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
   const { pathname } = useLocation();
   const navigate = useNavigate()
+  const { user,loading } = useSelector((state) => state.auth)
+  const dispatch = useDispatch()
 
+  const handleLogout = (e) => {
+    e.preventDefault()
+    dispatch(logoutUser());
+    navigate('/signin');
+};
   const menuItems = [
     { icon: Home, label: 'Dashboard', path: '/dashboard' },
     { icon: FileText, label: 'Surgery Records', path: '/dashboard/records' },
   ];
 
   return (
-    <div 
-      className={`${
-        collapsed ? 'w-20' : 'w-64'
-      } bg-gradient-to-b from-cyan-700 to-blue-800 text-white transition-all duration-300 flex flex-col h-screen relative`}
+    <div
+      className={`${collapsed ? 'w-20' : 'w-64'
+        } bg-gradient-to-b from-cyan-700 to-blue-800 text-white transition-all duration-300 flex flex-col h-screen relative`}
     >
       {/* Logo */}
       <div className="p-6 flex items-center justify-between border-b border-cyan-600">
@@ -52,14 +60,13 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
             <Link
               key={index}
               to={item.path}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition group ${
-                isActive
+              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition group ${isActive
                   ? 'bg-white text-cyan-700 shadow-md'
                   : 'text-cyan-100 hover:bg-cyan-600'
-              }`}
+                }`}
             >
               <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-cyan-700' : ''}`} />
-              
+
               {!collapsed && (
                 <span className={`font-medium ${isActive ? 'text-cyan-700' : ''}`}>
                   {item.label}
@@ -75,26 +82,36 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
         {!collapsed ? (
           <div className="flex items-center space-x-3 mb-4">
             <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center font-bold">
-              DJ
+            {user?.fullname
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2)}
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-sm">Dr. John Doe</p>
-              <p className="text-xs text-cyan-200">Cardiac Surgeon</p>
+              <p className="font-semibold text-sm">{user?.doctorId}</p>
+              <p className="text-xs text-cyan-200">{user?.specialty}</p>
             </div>
           </div>
         ) : (
           <div className="flex justify-center mb-4">
             <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center font-bold text-sm">
-              DJ
+              {user?.fullname
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2)}
             </div>
           </div>
         )}
 
-        <button 
-        onClick={()=>navigate('/')}
-        className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-lg transition">
+        <button
+        type='submit'
+            onClick={handleLogout}
+            disabled={loading}
+          className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-lg transition">
           <LogOut className="w-4 h-4" />
-          {!collapsed && <span className="text-sm font-medium">Logout</span>}
+          {!collapsed && <span className="text-sm font-medium">{loading ? "Logging out...":"Logout"}</span>}
         </button>
       </div>
     </div>

@@ -6,7 +6,8 @@ const PostOperativeMedicationSection = ({ formData, onInputChange }) => {
       <h2 className="text-xl font-bold text-gray-900 mb-4">Postoperative Medication</h2>
       <textarea
         value={formData.postoperativeMedication}
-        onChange={(e) => onInputChange('postoperativeMedication', e.target.value)}
+        name='postoperativeMedication'
+        onChange={onInputChange}
         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
         rows="4"
         placeholder="Enter postoperative medication details and instructions..."

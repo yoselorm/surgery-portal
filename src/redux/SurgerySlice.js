@@ -1,496 +1,185 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import api from '../utils/api';
+import { api_url_v1 } from '../utils/config';
 
-const surgerySlice = createSlice({
-  name: "surgeries",
-  initialState: {
-    list: [
-      {
-        id: 'SRG-2847',
-        patientName: 'S.J',
-        patientAge: 45,
-        gender: 'Female',
-        procedure: 'Biolitec Laser LHP',
-        type: 'Laser Surgery',
-        doctor: 'DR-001',
-        date: '2024-03-15',
-        time: '09:00 AM',
-        duration: '2 hours',
-        status: 'Completed',
-        statusColor: 'green',
-        formData: {
-          doctorID:'DR-001',
-          location: 'Main Operating Theater',
-          city: 'Accra',
-          laserWavelength: '1470nm',
-          laserPower: '8W',
-          laserPulseMode: '3.0s',
-          totalAppliedEnergy: '450',
-          medication: 'Aspirin 75mg, Paracetamol 500mg',
-          diagnostics: {
-            fissure: { observed: true, treated: true },
-            skinTags: { observed: false, treated: false },
-            analVeinThrombosis: { observed: true, treated: false }
-          },
-          treatmentMethods: {
-            medication: true,
-            surgery: true,
-            infraredCoagulation: false
-          },
-          vasScore: '7',
 
-          generalAnaesthesia: 'no',
-          regionalAnaesthesia: 'yes',
-          localAnaesthesia: 'yes',
-          hasComplications: 'no',
-          complications: '',
-          intraOperativeData: [
-            { position: '3', grade: 'II', energy: '150' },
-            { position: '7', grade: 'III', energy: '180' },
-            { position: '11', grade: 'II', energy: '120' }
-          ],
-          pain: '1_6_days_per_week',
-          itching: 'less_than_once_week',
-          bleeding: 'every_day',
-          soiling: 'never',
-          prolapsing: 'less_than_once_month',
-          postoperativeMedication: 'Antibiotics (Amoxicillin 500mg TDS), Pain relief (Ibuprofen 400mg PRN), Stool softeners'
-        },
-        // Follow-Up Schedule (NEW)
-        followUp: {
-          twoWeeks: {
-            completed: true,
-            date: '2024-03-29',
-            notes: 'Patient recovering well. Minimal pain reported. Wound healing nicely.'
-          },
-          sixWeeks: {
-            completed: true,
-            date: '2024-04-26',
-            notes: 'Excellent progress. No complications. Patient back to normal activities.'
-          },
-          threeMonths: {
-            completed: true,
-            date: '2024-06-15',
-            notes: 'Complete recovery. No bleeding or pain. Very satisfied with results.'
-          },
-          sixMonths: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          twelveMonths: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          twoYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          threeYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          fiveYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          }
-        }
-      },
-      {
-        id: 'SRG-3129',
-        patientName: 'M.C',
-        patientAge: 52,
-        gender: 'Male',
-        procedure: 'Biolitec Laser LHP',
-        type: 'Laser Surgery',
-        doctor: 'DR-002',
-        date: '2024-03-18',
-        time: '10:30 AM',
-        duration: '1.5 hours',
-        status: 'Completed',
-        statusColor: 'green',
-        formData: {
-          doctorID:'DR-002',
-          location: 'Theater 2',
-          city: 'Kumasi',
-          laserWavelength: '1470nm',
-          laserPower: '10W',
-          laserPulseMode: '2.5s',
-          totalAppliedEnergy: '520',
-          medication: 'Clopidogrel 75mg, Metformin 500mg',
-          diagnostics: {
-            fissure: { observed: false, treated: false },
-            skinTags: { observed: true, treated: true },
-            analVeinThrombosis: { observed: false, treated: false }
-          },
-          treatmentMethods: {
-            medication: true,
-            surgery: true,
-            infraredCoagulation: true
-          },
-          vasScore: '3',
-
-          generalAnaesthesia: 'no',
-          regionalAnaesthesia: 'yes',
-          localAnaesthesia: 'no',
-          hasComplications: 'no',
-          complications: '',
-          intraOperativeData: [
-            { position: '2', grade: 'III', energy: '195' },
-            { position: '6', grade: 'III', energy: '200' },
-            { position: '10', grade: 'II', energy: '125' }
-          ],
-          pain: 'every_day',
-          itching: '1_6_days_per_week',
-          bleeding: '1_6_days_per_week',
-          soiling: 'less_than_once_week',
-          prolapsing: 'every_day',
-          postoperativeMedication: 'Antibiotics (Ciprofloxacin 500mg BD), Pain relief (Paracetamol 1g QDS), Laxatives (Lactulose 15ml BD)'
-        },
-        // Follow-Up Schedule (NEW)
-        followUp: {
-          twoWeeks: {
-            completed: true,
-            date: '2024-03-29',
-            notes: 'Patient recovering well. Minimal pain reported. Wound healing nicely.'
-          },
-          sixWeeks: {
-            completed: true,
-            date: '2024-04-26',
-            notes: 'Excellent progress. No complications. Patient back to normal activities.'
-          },
-          threeMonths: {
-            completed: true,
-            date: '2024-06-15',
-            notes: 'Complete recovery. No bleeding or pain. Very satisfied with results.'
-          },
-          sixMonths: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          twelveMonths: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          twoYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          threeYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          fiveYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          }
-        }
-      },
-      {
-        id: 'SRG-3241',
-        patientName: 'A.O',
-        patientAge: 38,
-        gender: 'Female',
-        procedure: 'Biolitec Laser LHP',
-        type: 'Laser Surgery',
-        doctor: 'DR-001',
-        date: '2024-03-22',
-        time: '08:00 AM',
-        duration: '2.25 hours',
-        status: 'Completed',
-        statusColor: 'green',
-        formData: {
-          doctorID:'DR-001',
-          location: 'Main Operating Theater',
-          city: 'Accra',
-          laserWavelength: '1470nm',
-          laserPower: '7W',
-          laserPulseMode: '3.5s',
-          totalAppliedEnergy: '680',
-          medication: 'None',
-          diagnostics: {
-            fissure: { observed: true, treated: true },
-            skinTags: { observed: true, treated: true },
-            analVeinThrombosis: { observed: true, treated: true }
-          },
-          treatmentMethods: {
-            medication: false,
-            surgery: true,
-            infraredCoagulation: false
-          },
-          generalAnaesthesia: 'yes',
-          vasScore: '5',
-
-          regionalAnaesthesia: 'no',
-          localAnaesthesia: 'yes',
-          hasComplications: 'no',
-          complications: '',
-          intraOperativeData: [
-            { position: '1', grade: 'IV', energy: '220' },
-            { position: '5', grade: 'III', energy: '185' },
-            { position: '9', grade: 'IV', energy: '210' },
-            { position: '12', grade: 'II', energy: '65' }
-          ],
-          pain: 'every_day',
-          itching: 'every_day',
-          bleeding: 'every_day',
-          soiling: '1_6_days_per_week',
-          prolapsing: 'every_day',
-          postoperativeMedication: 'Antibiotics (Metronidazole 400mg TDS + Amoxicillin 500mg TDS), Pain relief (Tramadol 50mg PRN), Stool softeners, Anti-inflammatory (Diclofenac 50mg BD)'
-        },
-        // Follow-Up Schedule (NEW)
-        followUp: {
-          twoWeeks: {
-            completed: true,
-            date: '2024-03-29',
-            notes: 'Patient recovering well. Minimal pain reported. Wound healing nicely.'
-          },
-          sixWeeks: {
-            completed: true,
-            date: '2024-04-26',
-            notes: 'Excellent progress. No complications. Patient back to normal activities.'
-          },
-          threeMonths: {
-            completed: true,
-            date: '2024-06-15',
-            notes: 'Complete recovery. No bleeding or pain. Very satisfied with results.'
-          },
-          sixMonths: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          twelveMonths: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          twoYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          threeYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          fiveYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          }
-        }
-      },
-      {
-        id: 'SRG-3358',
-        patientName: 'D.M',
-        patientAge: 61,
-        gender: 'Male',
-        procedure: 'Biolitec Laser LHP',
-        type: 'Laser Surgery',
-        doctor: 'DR-003',
-        date: '2024-03-25',
-        time: '02:00 PM',
-        duration: '1.75 hours',
-        status: 'Completed',
-        statusColor: 'green',
-        formData: {
-          doctorID:'DR-003',
-          location: 'Theater 3',
-          city: 'Takoradi',
-          laserWavelength: '1470nm',
-          laserPower: '9W',
-          laserPulseMode: '2.8s',
-          totalAppliedEnergy: '395',
-          medication: 'Aspirin 75mg, Atorvastatin 20mg, Lisinopril 10mg',
-          diagnostics: {
-            fissure: { observed: false, treated: false },
-            skinTags: { observed: false, treated: false },
-            analVeinThrombosis: { observed: false, treated: false }
-          },
-          treatmentMethods: {
-            medication: true,
-            surgery: true,
-            infraredCoagulation: false
-          },
-          generalAnaesthesia: 'no',
-          vasScore: '7',
-
-          regionalAnaesthesia: 'yes',
-          localAnaesthesia: 'yes',
-          hasComplications: 'yes',
-          complications: 'Minor bleeding controlled with pressure',
-          intraOperativeData: [
-            { position: '4', grade: 'II', energy: '135' },
-            { position: '8', grade: 'III', energy: '170' },
-            { position: '12', grade: 'II', energy: '90' }
-          ],
-          pain: '1_6_days_per_week',
-          itching: 'never',
-          bleeding: 'less_than_once_month',
-          soiling: 'never',
-          prolapsing: '1_6_days_per_week',
-          postoperativeMedication: 'Antibiotics (Augmentin 625mg BD), Pain relief (Ibuprofen 400mg TDS), Stool softeners (Docusate 100mg BD)'
-        },
-        // Follow-Up Schedule (NEW)
-        followUp: {
-          twoWeeks: {
-            completed: true,
-            date: '2024-03-29',
-            notes: 'Patient recovering well. Minimal pain reported. Wound healing nicely.'
-          },
-          sixWeeks: {
-            completed: true,
-            date: '2024-04-26',
-            notes: 'Excellent progress. No complications. Patient back to normal activities.'
-          },
-          threeMonths: {
-            completed: true,
-            date: '2024-06-15',
-            notes: 'Complete recovery. No bleeding or pain. Very satisfied with results.'
-          },
-          sixMonths: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          twelveMonths: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          twoYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          threeYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          fiveYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          }
-        }
-      },
-      {
-        id: 'SRG-3472',
-        patientName: 'G.B',
-        patientAge: 29,
-        gender: 'Female',
-        procedure: 'Biolitec Laser LHP',
-        type: 'Laser Surgery',
-        doctor: 'DR-002',
-        date: '2024-03-28',
-        time: '11:00 AM',
-        duration: '1.25 hours',
-        status: 'Completed',
-        statusColor: 'green',
-        formData: {
-          doctorID:'DR-002',
-          location: 'Theater 2',
-          city: 'Kumasi',
-          laserWavelength: '1470nm',
-          laserPower: '6W',
-          laserPulseMode: '3.2s',
-          totalAppliedEnergy: '285',
-          medication: 'Iron supplements (Ferrous sulfate 200mg)',
-          diagnostics: {
-            fissure: { observed: false, treated: false },
-            skinTags: { observed: true, treated: false },
-            analVeinThrombosis: { observed: false, treated: false }
-          },
-          treatmentMethods: {
-            medication: true,
-            surgery: true,
-            infraredCoagulation: false
-          },
-          vasScore: '7',
-
-          generalAnaesthesia: 'no',
-          regionalAnaesthesia: 'no',
-          localAnaesthesia: 'yes',
-          hasComplications: 'no',
-          complications: '',
-          intraOperativeData: [
-            { position: '3', grade: 'II', energy: '95' },
-            { position: '7', grade: 'II', energy: '100' },
-            { position: '11', grade: 'II', energy: '90' }
-          ],
-          pain: 'less_than_once_week',
-          itching: 'less_than_once_month',
-          bleeding: '1_6_days_per_week',
-          soiling: 'never',
-          prolapsing: 'less_than_once_week',
-          postoperativeMedication: 'Antibiotics (Amoxicillin 500mg TDS), Pain relief (Paracetamol 500mg QDS), Stool softeners, Continue iron supplements'
-        },
-        // Follow-Up Schedule (NEW)
-        followUp: {
-          twoWeeks: {
-            completed: true,
-            date: '2024-03-29',
-            notes: 'Patient recovering well. Minimal pain reported. Wound healing nicely.'
-          },
-          sixWeeks: {
-            completed: true,
-            date: '2024-04-26',
-            notes: 'Excellent progress. No complications. Patient back to normal activities.'
-          },
-          threeMonths: {
-            completed: true,
-            date: '2024-06-15',
-            notes: 'Complete recovery. No bleeding or pain. Very satisfied with results.'
-          },
-          sixMonths: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          twelveMonths: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          twoYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          threeYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          },
-          fiveYears: {
-            completed: false,
-            date: '',
-            notes: ''
-          }
-        }
-      }
-    ],
-  },
-  reducers: {
-    addSurgery: (state, action) => {
-      state.list.unshift(action.payload);
-    },
-    deleteSurgery: (state, action) => {
-      state.list = state.list.filter(record => record.id !== action.payload);
+export const createSurgery = createAsyncThunk(
+  'surgery/create',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await api.post(`${api_url_v1}/surgery`, payload);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
     }
   }
+);
+
+// 2. Update surgery (save progress / follow-up / complete)
+export const updateSurgery = createAsyncThunk(
+  'surgery/update',
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const res = await api.put(`${api_url_v1}/upadete-surgery/${id}`, data);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// 3. Fetch all surgeries
+export const fetchSurgeries = createAsyncThunk(
+  'surgery/fetchAll',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`${api_url_v1}/surgery/my`);
+      return res.data.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// 4. Fetch surgeries by doctor
+export const fetchSurgeriesByDoctor = createAsyncThunk(
+  'surgery/fetchByDoctor',
+  async (doctorId, { rejectWithValue }) => {
+    try {
+      const res = await api.get(
+        `${api_url_v1}/surgeries/doctor/${doctorId}`
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+// 5. Fetch single surgery
+export const fetchSurgeryById = createAsyncThunk(
+  'surgery/fetchOne',
+  async (id, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`${api_url_v1}/user-surgery/${id}`);
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+/* =======================
+   SLICE
+======================= */
+
+const surgerySlice = createSlice({
+  name: 'surgery',
+  initialState: {
+    surgeries: [],
+    currentSurgery: null,
+    loading: false,
+    error: null,
+    success: false,
+  },
+
+  reducers: {
+    clearSurgeryError(state) {
+      state.error = null;
+    },
+    clearSurgerySuccess(state) {
+      state.success = false;
+    },
+    clearCurrentSurgery(state) {
+      state.currentSurgery = null;
+    },
+  },
+
+  extraReducers: (builder) => {
+    builder
+
+      /* CREATE */
+      .addCase(createSurgery.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createSurgery.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.surgeries.unshift(action.payload);
+      })
+      .addCase(createSurgery.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      /* UPDATE */
+      .addCase(updateSurgery.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateSurgery.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+
+        state.surgeries = state.surgeries.map((s) =>
+          s._id === action.payload._id ? action.payload : s
+        );
+
+        if (state.currentSurgery?._id === action.payload._id) {
+          state.currentSurgery = action.payload;
+        }
+      })
+      .addCase(updateSurgery.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      /* FETCH ALL */
+      .addCase(fetchSurgeries.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchSurgeries.fulfilled, (state, action) => {
+        state.loading = false;
+        state.surgeries = action.payload;
+      })
+      .addCase(fetchSurgeries.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      /* FETCH BY DOCTOR */
+      .addCase(fetchSurgeriesByDoctor.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchSurgeriesByDoctor.fulfilled, (state, action) => {
+        state.loading = false;
+        state.surgeries = action.payload;
+      })
+      .addCase(fetchSurgeriesByDoctor.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      /* FETCH ONE */
+      .addCase(fetchSurgeryById.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchSurgeryById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.currentSurgery = action.payload;
+      })
+      .addCase(fetchSurgeryById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
 });
 
-export const { addSurgery, deleteSurgery } = surgerySlice.actions;
+export const {
+  clearSurgeryError,
+  clearSurgerySuccess,
+  clearCurrentSurgery,
+} = surgerySlice.actions;
+
 export default surgerySlice.reducer;

@@ -48,10 +48,10 @@ const ClinicalPresentationSection = ({ formData, onInputChange }) => {
                   <td key={freq.value} className="px-4 py-3 text-center border-r">
                     <input
                       type="radio"
-                      name={symptom.key}
+                      name={`symptoms.${symptom.key}`} 
                       value={freq.value}
-                      checked={formData[symptom.key] === freq.value}
-                      onChange={(e) => onInputChange(symptom.key, e.target.value)}
+                      checked={formData.symptoms[symptom.key] === freq.value}
+                      onChange={onInputChange}
                       className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
                     />
                   </td>

@@ -22,7 +22,7 @@ const SurgeryDetailsPage = () => {
   const dispatch = useDispatch();
 
   const records = useSelector((state) => state.surgeries.list);
-  const surgeryRecord = records.find((item) => String(item.id) === String(id));
+  const surgeryRecord = records?.find((item) => String(item.id) === String(id));
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedData, setEditedData] = useState(surgeryRecord);

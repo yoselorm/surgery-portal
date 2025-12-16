@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { ArrowLeft, Activity, Save, Send } from 'lucide-react';
-import { addSurgery } from '../../redux/SurgerySlice';
+import { createSurgery } from '../../redux/SurgerySlice';
 
 import FormHeader from './FormHeader';
 import DoctorInfoSection from './DoctorInfoSection';
@@ -20,13 +20,25 @@ import PostOperativeMedicationSection from './PostOperativeMedicationSection';
 const BiolitecLaserLHPForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading } = useSelector((state) => state.surgeries)
+  const [badge, setBadge] = useState({
+    show: false,
+    type: 'success',
+    message: '',
+  });
+
+  const showBadge = (type, message, timeout = 3000) => {
+    setBadge({ show: true, type, message });
+
+    setTimeout(() => {
+      setBadge({ show: false, type, message: '' });
+    }, timeout);
+  };
+
 
   const [formData, setFormData] = useState({
-    // doctorName: '',
-    // location: '',
-    // city: '',
     date: '',
-    patientInitials: '',
+    patientName: '',
     patientAge: '',
     gender: '',
     laserWavelength: '1470nm',
@@ -56,8 +68,8 @@ const BiolitecLaserLHPForm = () => {
       radioFrequencyAblation: false
     },
     spinalAnaesthesia: 'no',
-    saddleBlock:'no',
-    pudendusBlock:'no',
+    saddleBlock: 'no',
+    pudendusBlock: 'no',
     generalAnaesthesia: 'no',
     regionalAnaesthesia: 'no',
     localAnaesthesia: 'no',
@@ -65,101 +77,183 @@ const BiolitecLaserLHPForm = () => {
     hasPreviousOp: 'no',
     postoperativeMedication: '',
     intraOperativeData: [],
-    pain: '',
-    itching: '',
-    bleeding: '',
-    soiling: '',
-    prolapsing: '',
+    symptoms: {
+      pain: '',
+      itching: '',
+      bleeding: '',
+      soiling: '',
+      prolapsing: '',
+    },
     vasScore: '',
     followUp: {
-      twoWeeks: { completed: false, date: '', vasScore: '', notes: '',symptoms: {
-        pain: '',
-        itching: '',
-        bleeding: '',
-        soiling: '',
-        prolapsing: ''
-      }, },
-      sixWeeks: { completed: false, date: '', vasScore: '', notes: '',symptoms: {
-        pain: '',
-        itching: '',
-        bleeding: '',
-        soiling: '',
-        prolapsing: ''
-      }, },
-      threeMonths: { completed: false, date: '', vasScore: '', notes: '',symptoms: {
-        pain: '',
-        itching: '',
-        bleeding: '',
-        soiling: '',
-        prolapsing: ''
-      }, },
-      sixMonths: { completed: false, date: '', vasScore: '', notes: '',symptoms: {
-        pain: '',
-        itching: '',
-        bleeding: '',
-        soiling: '',
-        prolapsing: ''
-      }, },
-      twelveMonths: { completed: false, date: '', vasScore: '', notes: '',symptoms: {
-        pain: '',
-        itching: '',
-        bleeding: '',
-        soiling: '',
-        prolapsing: ''
-      }, },
-      twoYears: { completed: false, date: '', vasScore: '', notes: '',symptoms: {
-        pain: '',
-        itching: '',
-        bleeding: '',
-        soiling: '',
-        prolapsing: ''
-      }, },
-      threeYears: { completed: false, date: '', vasScore: '', notes: '',symptoms: {
-        pain: '',
-        itching: '',
-        bleeding: '',
-        soiling: '',
-        prolapsing: ''
-      }, },
-      fiveYears: { completed: false, date: '', vasScore: '', notes: '',symptoms: {
-        pain: '',
-        itching: '',
-        bleeding: '',
-        soiling: '',
-        prolapsing: ''
-      }, }
+      twoWeeks: {
+        completed: false, date: '', vasScore: '', notes: '', symptoms: {
+          pain: '',
+          itching: '',
+          bleeding: '',
+          soiling: '',
+          prolapsing: ''
+        },
+      },
+      sixWeeks: {
+        completed: false, date: '', vasScore: '', notes: '', symptoms: {
+          pain: '',
+          itching: '',
+          bleeding: '',
+          soiling: '',
+          prolapsing: ''
+        },
+      },
+      threeMonths: {
+        completed: false, date: '', vasScore: '', notes: '', symptoms: {
+          pain: '',
+          itching: '',
+          bleeding: '',
+          soiling: '',
+          prolapsing: ''
+        },
+      },
+      sixMonths: {
+        completed: false, date: '', vasScore: '', notes: '', symptoms: {
+          pain: '',
+          itching: '',
+          bleeding: '',
+          soiling: '',
+          prolapsing: ''
+        },
+      },
+      twelveMonths: {
+        completed: false, date: '', vasScore: '', notes: '', symptoms: {
+          pain: '',
+          itching: '',
+          bleeding: '',
+          soiling: '',
+          prolapsing: ''
+        },
+      },
+      twoYears: {
+        completed: false, date: '', vasScore: '', notes: '', symptoms: {
+          pain: '',
+          itching: '',
+          bleeding: '',
+          soiling: '',
+          prolapsing: ''
+        },
+      },
+      threeYears: {
+        completed: false, date: '', vasScore: '', notes: '', symptoms: {
+          pain: '',
+          itching: '',
+          bleeding: '',
+          soiling: '',
+          prolapsing: ''
+        },
+      },
+      fiveYears: {
+        completed: false, date: '', vasScore: '', notes: '', symptoms: {
+          pain: '',
+          itching: '',
+          bleeding: '',
+          soiling: '',
+          prolapsing: ''
+        },
+      }
     }
   });
 
-  const handleInputChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
 
-  const handleSubmit = (e) => {
+
+
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newRecord = {
-      id: `SRG-${Math.floor(Math.random() * 9000) + 1000}`,
-      patientName: formData.patientInitials,
-      patientAge: formData.patientAge,
+
+    const {
+      patientName,
+      patientAge,
+      gender,
+      date,
+      ...clinicalFormData
+    } = formData;
+
+    const payload = {
+      patientName,
+      patientAge: Number(patientAge),
+      gender,
+      date,
       procedure: 'Biolitec Laser LHP',
-      type: 'Laser Surgery',
-      doctor: formData.doctorName,
-      date: formData.date,
-      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-      duration: 'N/A',
-      status: 'Completed',
-      statusColor: 'green',
-      formData: formData
+      surgeryType: 'Laser Surgery',
+      status: 'incomplete',
+      time: new Date().toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+      formData: clinicalFormData,
     };
-    dispatch(addSurgery(newRecord));
-    alert('Surgery record submitted successfully!');
-    navigate(-1);
+
+    try {
+      await dispatch(createSurgery(payload)).unwrap();
+
+      showBadge('success', 'Surgery record saved successfully');
+
+      // Optional: delay navigation slightly so doctor sees feedback
+      setTimeout(() => navigate(-1), 1200);
+    } catch (err) {
+      showBadge('error', err?.message || 'Failed to save surgery record');
+    }
   };
 
-  const handleSaveDraft = () => {
-    console.log('Saving draft:', formData);
-    alert('Draft saved successfully!');
+  const handleSaveDraft = async () => {
+    try {
+      const {
+        patientName,
+        patientAge,
+        gender,
+        date,
+        ...clinicalFormData
+      } = formData;
+
+      await dispatch(
+        createSurgery({
+          patientName,
+          patientAge: Number(patientAge),
+          gender,
+          date,
+          procedure: 'Biolitec Laser LHP',
+          surgeryType: 'Laser Surgery',
+          status: 'incomplete',
+          formData: clinicalFormData,
+        })
+      ).unwrap();
+
+      showBadge('info', 'Draft saved');
+    } catch (err) {
+      showBadge('error', 'Failed to save draft');
+    }
   };
+
+
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setFormData((prev) => {
+      const keys = name.split('.');
+      let updated = { ...prev };
+      let temp = updated;
+
+      for (let i = 0; i < keys.length - 1; i++) {
+        temp[keys[i]] = { ...temp[keys[i]] };
+        temp = temp[keys[i]];
+      }
+
+      temp[keys[keys.length - 1]] =
+        type === 'checkbox' ? checked : value;
+
+      return updated;
+    });
+  };
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -174,6 +268,9 @@ const BiolitecLaserLHPForm = () => {
         </button>
 
         <FormHeader />
+
+      
+
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 space-y-8">
           <DoctorInfoSection
@@ -229,7 +326,20 @@ const BiolitecLaserLHPForm = () => {
             formData={formData}
             setFormData={setFormData}
           />
-
+  {badge.show && (
+          <div
+            className={`mb-6 rounded-lg px-4 py-3 text-sm font-semibold flex items-center gap-2
+      ${badge.type === 'success'
+                ? 'bg-green-100 text-green-800 border border-green-300'
+                : badge.type === 'error'
+                  ? 'bg-red-100 text-red-800 border border-red-300'
+                  : 'bg-blue-100 text-blue-800 border border-blue-300'
+              }`}
+          >
+            <Activity className="w-4 h-4" />
+            {badge.message}
+          </div>
+        )}
           {/* Action Buttons */}
           <div className="pt-8 border-t border-gray-200 flex items-center justify-between">
             <button
@@ -243,13 +353,16 @@ const BiolitecLaserLHPForm = () => {
 
             <button
               type="submit"
+              disabled={loading}
               onClick={handleSubmit}
               className="flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg hover:from-cyan-700 hover:to-blue-700 transition font-semibold shadow-lg"
             >
               <Send className="w-5 h-5" />
-              <span>Submit Record</span>
+              <span>{loading ? 'Saving...' : 'Submit Record'}</span>
             </button>
           </div>
+
+          
         </div>
       </div>
     </div>

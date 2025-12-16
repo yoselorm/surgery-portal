@@ -1,23 +1,17 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Plus,
   Search,
-  Filter,
   Download,
   Eye,
-  Edit,
-  Trash2,
-  MoreVertical,
   Calendar,
-  User,
   Clock,
-  FileText
 } from 'lucide-react';
 import SurgeryTypeModal from '../components/SurgeryTypeModal';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteSurgery } from '../redux/SurgerySlice';
 import { exportToCSV } from '../utils/Helper';
+import { fetchSurgeries } from '../redux/SurgerySlice';
 
 const SurgeryRecords = () => {
   const [showModal, setShowModal] = useState(false);
@@ -25,55 +19,91 @@ const SurgeryRecords = () => {
   const [filterStatus, setFilterStatus] = useState('all');
 
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchSurgeries());
+  }, [dispatch]);
 
   const handleSelectSurgery = (surgeryType) => {
     navigate(surgeryType.route);
   };
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this surgery record?")) {
-      dispatch(deleteSurgery(id));
+
+  const { surgeries } = useSelector((state) => state.surgeries);
+
+  const handleExport = () => {
+    exportToCSV(surgeries, "all_surgery_records.csv");
+  };
+
+  // Format date helper
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+
+  // Format time helper
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
+
+  // Get status color mapping
+  const getStatusColor = (status) => {
+    const statusLower = status?.toLowerCase();
+    switch (statusLower) {
+      case 'completed':
+      case 'complete':
+        return 'green';
+      case 'in-progress':
+      case 'in progress':
+        return 'blue';
+      case 'scheduled':
+        return 'yellow';
+      case 'incomplete':
+        return 'red';
+      default:
+        return 'gray';
     }
   };
 
-
-  const records = useSelector((state) => state.surgeries.list);
-
-  const handleExport = () => {
-    exportToCSV(records, "all_surgery_records.csv");
-  };
-
-  const filteredRecords = records
+  const filteredRecords = surgeries
     ?.filter((r) => {
-      const term = searchTerm.toLowerCase();
+      const term = searchTerm?.toLowerCase();
       return (
-        r.id.toLowerCase().includes(term) ||
-        r.patientName.toLowerCase().includes(term) ||
-        r.procedure.toLowerCase().includes(term)
+        r.surgeryId?.toLowerCase().includes(term) ||
+        r.patientName?.toLowerCase().includes(term) ||
+        r.procedure?.toLowerCase().includes(term)
       );
     })
     .filter((r) =>
       filterStatus === "all"
         ? true
-        : r.status.toLowerCase() === filterStatus.toLowerCase()
+        : r.status?.toLowerCase() === filterStatus.toLowerCase()
     );
 
-
-  const getStatusBadge = (status, color) => {
+  const getStatusBadge = (status) => {
+    const color = getStatusColor(status);
     const colors = {
       green: 'bg-green-100 text-green-700 border-green-200',
       blue: 'bg-blue-100 text-blue-700 border-blue-200',
       yellow: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      red: 'bg-red-100 text-red-700 border-red-200'
+      red: 'bg-red-100 text-red-700 border-red-200',
+      gray: 'bg-gray-100 text-gray-700 border-gray-200'
     };
 
     return (
       <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${colors[color]}`}>
-        {status}
+        {status || 'Unknown'}
       </span>
     );
   };
-
 
   return (
     <div className="p-6 space-y-6">
@@ -82,8 +112,8 @@ const SurgeryRecords = () => {
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         onSelectSurgery={handleSelectSurgery}
-
       />
+
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
@@ -122,15 +152,17 @@ const SurgeryRecords = () => {
           >
             <option value="all">All Status</option>
             <option value="completed">Completed</option>
+            <option value="incomplete">Incomplete</option>
             <option value="in-progress">In Progress</option>
             <option value="scheduled">Scheduled</option>
           </select>
 
           {/* Export Button */}
-          <button className="flex items-center justify-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-            <Download
-              onClick={handleExport}
-              className="w-4 h-4" />
+          <button 
+            onClick={handleExport}
+            className="flex items-center justify-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+          >
+            <Download className="w-4 h-4" />
             <span>Export</span>
           </button>
         </div>
@@ -154,9 +186,6 @@ const SurgeryRecords = () => {
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Type
                 </th>
-                {/* <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Doctor
-                </th> */}
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Date & Time
                 </th>
@@ -169,56 +198,46 @@ const SurgeryRecords = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredRecords.map((record, index) => (
-                <tr key={index} className="hover:bg-gray-50 transition">
+              {filteredRecords?.map((record) => (
+                <tr key={record._id} className="hover:bg-gray-50 transition">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="font-semibold text-cyan-600">{record.id}</span>
+                    <span className="font-semibold text-cyan-600">{record.surgeryId}</span>
                   </td>
                   <td className="px-6 py-4">
                     <div>
                       <p className="font-semibold text-gray-900">{record.patientName}</p>
-                      <p className="text-sm text-gray-500">{record.patientAge} years old</p>
+                      <p className="text-sm text-gray-500">
+                        {record.patientAge} years old • {record.gender}
+                      </p>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <p className="font-medium text-gray-900">{record.procedure}</p>
-                    <p className="text-sm text-gray-500">{record.duration}</p>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-sm text-gray-700">{record.type}</span>
+                    <span className="text-sm text-gray-700">{record.surgeryType}</span>
                   </td>
-                  {/* <td className="px-6 py-4">
-                    <span className="text-sm text-gray-700">{record.doctor}</span>
-                  </td> */}
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2 text-sm text-gray-700">
                       <Calendar className="w-4 h-4 text-gray-400" />
-                      <span>{record.date}</span>
+                      <span>{formatDate(record.date)}</span>
                     </div>
                     <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
                       <Clock className="w-4 h-4 text-gray-400" />
-                      <span>{record.time}</span>
+                      <span>{formatTime(record.date)}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    {getStatusBadge(record.status, record.statusColor)}
+                    {getStatusBadge(record.status)}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => navigate(`${record.id}`)}
+                        onClick={() => navigate(`/dashboard/records/${record._id}`)}
                         className="p-2 text-cyan-600 hover:bg-cyan-50 rounded-lg transition"
                         title="View"
                       >
                         <Eye className="w-4 h-4" />
-                      </button>
-                      {/* <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit">
-                        <Edit className="w-4 h-4" />
-                      </button> */}
-                      <button
-                        onClick={() => handleDelete(record.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
-                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </td>
@@ -229,9 +248,13 @@ const SurgeryRecords = () => {
                 <tr>
                   <td
                     colSpan="7"
-                    className="text-center py-6 text-gray-500 italic"
+                    className="text-center py-12 text-gray-500"
                   >
-                    No records found
+                    <div className="flex flex-col items-center space-y-2">
+                      <Search className="w-12 h-12 text-gray-300" />
+                      <p className="font-medium">No records found</p>
+                      <p className="text-sm">Try adjusting your search or filters</p>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -242,7 +265,8 @@ const SurgeryRecords = () => {
         {/* Pagination */}
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            Showing <span className="font-semibold">1-6</span> of <span className="font-semibold">48</span> records
+            Showing <span className="font-semibold">1-{Math.min(filteredRecords?.length || 0, 10)}</span> of{' '}
+            <span className="font-semibold">{filteredRecords?.length || 0}</span> records
           </p>
           <div className="flex space-x-2">
             <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white transition text-sm font-medium">
@@ -252,19 +276,11 @@ const SurgeryRecords = () => {
               1
             </button>
             <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white transition text-sm font-medium">
-              2
-            </button>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white transition text-sm font-medium">
-              3
-            </button>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white transition text-sm font-medium">
               Next
             </button>
           </div>
         </div>
       </div>
-
-
     </div>
   );
 };

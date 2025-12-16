@@ -16,10 +16,11 @@ const VasScoreSection = ({ formData, onInputChange }) => {
           <div className="flex items-center space-x-4">
             <input
               type="range"
+              name="vasScore"
               min="0"
               max="10"
               value={formData.vasScore}
-              onChange={(e) => onInputChange('vasScore', e.target.value)}
+              onChange={onInputChange}
               className="flex-1 h-3 bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 rounded-lg appearance-none cursor-pointer"
             />
             <div className="w-20 text-center">

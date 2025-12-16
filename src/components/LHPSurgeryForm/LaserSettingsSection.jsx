@@ -15,7 +15,8 @@ const LaserSettingsSection = ({ formData, onInputChange }) => {
           </label>
           <select
             value={formData.laserWavelength}
-            onChange={(e) => onInputChange('laserWavelength', e.target.value)}
+            name='laserWavelength'
+            onChange={onInputChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
           >
             <option value="1470nm">1470nm</option>
@@ -32,7 +33,8 @@ const LaserSettingsSection = ({ formData, onInputChange }) => {
           <input
             type="text"
             value={formData.laserPower}
-            onChange={(e) => onInputChange('laserPower', e.target.value)}
+            name='laserPower'
+            onChange={onInputChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             placeholder="e.g., 8W"
           />
@@ -45,7 +47,8 @@ const LaserSettingsSection = ({ formData, onInputChange }) => {
           <input
             type="text"
             value={formData.laserPulseMode}
-            onChange={(e) => onInputChange('laserPulseMode', e.target.value)}
+            name='laserPulseMode'
+            onChange={onInputChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             placeholder="e.g., 3.0s"
           />
@@ -58,7 +61,8 @@ const LaserSettingsSection = ({ formData, onInputChange }) => {
         </label>
         <textarea
           value={formData.medication}
-          onChange={(e) => onInputChange('medication', e.target.value)}
+          name='medication'
+          onChange={onInputChange}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
           rows="2"
           placeholder="Enter medication details"

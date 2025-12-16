@@ -1,20 +1,51 @@
 import React, { useState } from 'react';
 import { Activity, Eye, EyeOff, Mail, Lock, ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { userLogin } from '../redux/AuthSlice';
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { loading } = useSelector((state) => state.auth);
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const handleSubmit = (e) => {
-    // e.preventDefault();
-    // console.log('Sign in with:', { email, password, rememberMe });
-    // // Add your authentication logic here
-    navigate('/dashboard')
+
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setErrorMessage(""); // clear previous errors
+    setSuccessMessage(""); // clear previous success
+
+    dispatch(userLogin({ email, password }))
+      .unwrap()
+      .then(() => {
+        // show success badge (optional)
+        setSuccessMessage("Login successful ✅");
+
+        // navigate after short delay
+        setTimeout(() => {
+          setSuccessMessage(""); // clear badge
+          navigate("/dashboard");
+        }, 1500);
+      })
+      .catch((err) => {
+        // handle error properly
+        if (typeof err === "string") {
+          setErrorMessage(err);
+        } else if (err?.message) {
+          setErrorMessage(err.message);
+        } else {
+          setErrorMessage("Login failed. Please try again.");
+        }
+      });
   };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cyan-50 via-blue-50 to-white flex items-center justify-center p-4">
@@ -23,15 +54,14 @@ const SignInPage = () => {
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
 
       <div className="w-full max-w-md relative z-10">
-        {/* Back to Home Link */}
-        <a 
-          href="/" 
+
+        <a
+          href="/"
           className="inline-flex items-center space-x-2 text-gray-600 hover:text-cyan-600 transition mb-8 group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition" />
           <span className="font-medium">Back to Home</span>
         </a>
-
         {/* Sign In Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12">
           {/* Logo and Header */}
@@ -45,8 +75,28 @@ const SignInPage = () => {
             <p className="text-gray-600">Sign in to access your account</p>
           </div>
 
+     
+
+            {successMessage && (
+              <div className="mt-4">
+                <div className="bg-green-100 border border-green-300 text-green-700 px-4 py-2 rounded-lg text-sm font-semibold">
+                  {successMessage}
+                </div>
+              </div>
+            )}
+
+            {errorMessage && (
+              <div className="mt-4">
+                <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-lg text-sm font-semibold">
+                  {errorMessage}
+                </div>
+              </div>
+            )}
+       
+
+
           {/* Sign In Form */}
-          <div className="space-y-6">
+          <div className="pt-6 space-y-6">
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
@@ -111,26 +161,29 @@ const SignInPage = () => {
                   Remember me
                 </span>
               </label>
-              <a
-                href="/forgot-password"
+              <Link
+                to="/forgot-password"
                 className="text-sm font-semibold text-cyan-600 hover:text-cyan-700 transition"
               >
                 Forgot Password?
-              </a>
+              </Link>
             </div>
 
             {/* Sign In Button */}
+
             <button
-              onClick={handleSubmit}
-              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-cyan-600/50 transition transform hover:-translate-y-0.5 text-lg"
+              type='submit'
+              onClick={handleLogin}
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white py-4 rounded-xl font-semibold hover:shadow-lg hover:shadow-cyan-600/50 transition transform hover:-translate-y-0.5 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign In
+              {loading ? "Signing in..." : "Sign In"}
             </button>
           </div>
 
 
 
-       
+
         </div>
 
         {/* Footer */}
@@ -151,3 +204,4 @@ const SignInPage = () => {
 };
 
 export default SignInPage;
+

@@ -15,8 +15,9 @@ const PatientInfoSection = ({ formData, onInputChange }) => {
           </label>
           <input
             type="text"
-            value={formData.patientInitials}
-            onChange={(e) => onInputChange('patientInitials', e.target.value)}
+            name="patientName" 
+            value={formData.patientName}
+            onChange={onInputChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             placeholder="e.g., J.D."
           />
@@ -28,8 +29,9 @@ const PatientInfoSection = ({ formData, onInputChange }) => {
           </label>
           <input
             type="number"
+            name="patientAge" 
             value={formData.patientAge}
-            onChange={(e) => onInputChange('patientAge', e.target.value)}
+            onChange={onInputChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             placeholder="Enter age"
           />
@@ -41,7 +43,8 @@ const PatientInfoSection = ({ formData, onInputChange }) => {
           </label>
           <select
             value={formData.gender}
-            onChange={(e) => onInputChange('gender', e.target.value)}
+            name="gender" 
+            onChange={onInputChange}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
           >
             <option value="">Select gender</option>

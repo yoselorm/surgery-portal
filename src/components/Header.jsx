@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
-import { 
-  Search, 
-  Bell, 
-  Mail, 
+import {
+  Search,
+  Bell,
+  Mail,
   ChevronDown,
   User,
   Settings,
   LogOut,
   HelpCircle
 } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const { user } = useSelector((state) => state.auth)
+
 
   const notifications = [
     { id: 1, text: 'New surgery scheduled for tomorrow', time: '5 min ago', unread: true },
@@ -81,9 +85,8 @@ const Header = () => {
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                      notification.unread ? 'bg-cyan-50' : ''
-                    }`}
+                    className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${notification.unread ? 'bg-cyan-50' : ''
+                      }`}
                   >
                     <div className="flex items-start space-x-3">
                       <div className={`w-2 h-2 rounded-full mt-2 ${notification.unread ? 'bg-cyan-600' : 'bg-gray-300'}`}></div>
@@ -124,11 +127,15 @@ const Header = () => {
             className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg transition"
           >
             <div className="w-9 h-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-              DJ
+              {user?.fullname
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2)}
             </div>
             <div className="hidden md:block text-left">
-              <p className="text-sm font-semibold text-gray-900">Dr. John Doe</p>
-              <p className="text-xs text-gray-500">Cardiac Surgeon</p>
+              <p className="text-sm font-semibold text-gray-900">Dr. {user?.fullname}</p>
+              <p className="text-xs text-gray-500">{user?.specialty}</p>
             </div>
             <ChevronDown className="w-4 h-4 text-gray-600" />
           </button>
@@ -139,23 +146,26 @@ const Header = () => {
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                    DJ
+                  {user?.fullname
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2)}
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">Dr. John Doe</p>
-                    <p className="text-xs text-gray-500">john.doe@hospital.com</p>
+                    <p className="font-semibold text-gray-900">{user?.doctorId}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
                   </div>
                 </div>
               </div>
-              
+
               <div className="py-2">
-                <a
-                  href="/profile"
+                <Link to='/dashboard/profile'
                   className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition"
                 >
                   <User className="w-4 h-4 text-gray-600" />
                   <span className="text-sm text-gray-700">My Profile</span>
-                </a>
+                </Link>
                 <a
                   href="/settings"
                   className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition"

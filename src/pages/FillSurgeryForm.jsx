@@ -7,7 +7,6 @@ const FillSurgeryForm = () => {
   const { surgeryType } = useParams();
 
 
-  console.log(surgeryType)
   // Render the appropriate form based on surgery type
   const renderForm = () => {
     switch(surgeryType) {

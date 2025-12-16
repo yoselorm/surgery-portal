@@ -15,8 +15,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="yes"
+                name='generalAnaesthesia'
                 checked={formData.generalAnaesthesia === 'yes'}
-                onChange={(e) => onInputChange('generalAnaesthesia', e.target.value)}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -25,8 +26,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="no"
+                name='generalAnaesthesia'
                 checked={formData.generalAnaesthesia === 'no'}
-                onChange={(e) => onInputChange('generalAnaesthesia', e.target.value)}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>
@@ -44,8 +46,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="yes"
+                name='regionalAnaesthesia'
                 checked={formData.regionalAnaesthesia === 'yes'}
-                onChange={(e) => onInputChange('regionalAnaesthesia', e.target.value)}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -54,8 +57,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="no"
+                name='regionalAnaesthesia'
                 checked={formData.regionalAnaesthesia === 'no'}
-                onChange={(e) => onInputChange('regionalAnaesthesia', e.target.value)}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>
@@ -73,8 +77,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="yes"
+                name='localAnaesthesia'
                 checked={formData.localAnaesthesia === 'yes'}
-                onChange={(e) => onInputChange('localAnaesthesia', e.target.value)}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -83,8 +88,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="no"
+                name='localAnaesthesia'
                 checked={formData.localAnaesthesia === 'no'}
-                onChange={(e) => onInputChange('localAnaesthesia', e.target.value)}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>
@@ -100,8 +106,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="yes"
+                name='spinalAnaesthesia'
                 checked={formData.spinalAnaesthesia === 'yes'}
-                onChange={(e) => onInputChange('spinalAnaesthesia', e.target.value)}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -110,8 +117,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="no"
-                checked={formData.localAnaesthesia === 'no'}
-                onChange={(e) => onInputChange('spinalAnaesthesia', e.target.value)}
+                name='spinalAnaesthesia'
+                checked={formData.spinalAnaesthesia === 'no'}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>
@@ -127,8 +135,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="yes"
+                name='saddleBlock'
                 checked={formData.saddleBlock === 'yes'}
-                onChange={(e) => onInputChange('saddleBlock', e.target.value)}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -137,8 +146,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="no"
-                checked={formData.localAnaesthesia === 'no'}
-                onChange={(e) => onInputChange('saddleBlock', e.target.value)}
+                name='saddleBlock'
+                checked={formData.saddleBlock === 'no'}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>
@@ -154,8 +164,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="yes"
+                name='pudendusBlock'
                 checked={formData.pudendusBlock === 'yes'}
-                onChange={(e) => onInputChange('pudendusBlock', e.target.value)}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -164,8 +175,9 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
               <input
                 type="radio"
                 value="no"
-                checked={formData.localAnaesthesia === 'no'}
-                onChange={(e) => onInputChange('pudendusBlock', e.target.value)}
+                name='pudendusBlock'
+                checked={formData.pudendusBlock === 'no'}
+                onChange={onInputChange}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>
