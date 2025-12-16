@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileText } from 'lucide-react';
 
-const DiagnosticsSection = ({ formData, setFormData }) => {
+const DiagnosticsSection = ({ formData, setFormData,disabled }) => {
   const diagnosticItems = [
     { key: 'fissure', label: 'Fissure' },
     { key: 'skinTags', label: 'Skin Tags' },
@@ -57,6 +57,7 @@ const DiagnosticsSection = ({ formData, setFormData }) => {
                     type="checkbox"
                     checked={formData.diagnostics[item.key].observed}
                     onChange={(e) => handleDiagnosticChange(item.key, 'observed', e.target.checked)}
+                    disabled={disabled}
                     className="w-4 h-4 text-cyan-600 rounded focus:ring-cyan-500"
                   />
                 </td>
@@ -65,6 +66,7 @@ const DiagnosticsSection = ({ formData, setFormData }) => {
                     type="checkbox"
                     checked={formData.diagnostics[item.key].treated}
                     onChange={(e) => handleDiagnosticChange(item.key, 'treated', e.target.checked)}
+                    disabled={disabled}
                     className="w-4 h-4 text-cyan-600 rounded focus:ring-cyan-500"
                   />
                 </td>
@@ -76,6 +78,7 @@ const DiagnosticsSection = ({ formData, setFormData }) => {
                   type="text"
                   value={formData.diagnostics.others.description}
                   onChange={(e) => handleDiagnosticChange('others', 'description', e.target.value)}
+                  disabled={disabled}
                   className="w-full px-3 py-1 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-cyan-500"
                   placeholder="Others (specify)"
                 />
@@ -85,6 +88,7 @@ const DiagnosticsSection = ({ formData, setFormData }) => {
                   type="checkbox"
                   checked={formData.diagnostics.others.observed}
                   onChange={(e) => handleDiagnosticChange('others', 'observed', e.target.checked)}
+                  disabled={disabled}
                   className="w-4 h-4 text-cyan-600 rounded focus:ring-cyan-500"
                 />
               </td>
@@ -93,6 +97,7 @@ const DiagnosticsSection = ({ formData, setFormData }) => {
                   type="checkbox"
                   checked={formData.diagnostics.others.treated}
                   onChange={(e) => handleDiagnosticChange('others', 'treated', e.target.checked)}
+                  disabled={disabled}
                   className="w-4 h-4 text-cyan-600 rounded focus:ring-cyan-500"
                 />
               </td>

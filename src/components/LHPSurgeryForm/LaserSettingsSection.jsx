@@ -1,7 +1,7 @@
 import React from 'react';
 import { Activity } from 'lucide-react';
 
-const LaserSettingsSection = ({ formData, onInputChange }) => {
+const LaserSettingsSection = ({ formData, onInputChange,disabled }) => {
   return (
     <div className="pt-6 border-t border-gray-200">
       <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
@@ -17,6 +17,7 @@ const LaserSettingsSection = ({ formData, onInputChange }) => {
             value={formData.laserWavelength}
             name='laserWavelength'
             onChange={onInputChange}
+            disabled={disabled}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
           >
             <option value="1470nm">1470nm</option>
@@ -35,6 +36,7 @@ const LaserSettingsSection = ({ formData, onInputChange }) => {
             value={formData.laserPower}
             name='laserPower'
             onChange={onInputChange}
+            disabled={disabled}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             placeholder="e.g., 8W"
           />
@@ -49,6 +51,7 @@ const LaserSettingsSection = ({ formData, onInputChange }) => {
             value={formData.laserPulseMode}
             name='laserPulseMode'
             onChange={onInputChange}
+            disabled={disabled}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             placeholder="e.g., 3.0s"
           />
@@ -63,6 +66,7 @@ const LaserSettingsSection = ({ formData, onInputChange }) => {
           value={formData.medication}
           name='medication'
           onChange={onInputChange}
+          disabled={disabled}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
           rows="2"
           placeholder="Enter medication details"

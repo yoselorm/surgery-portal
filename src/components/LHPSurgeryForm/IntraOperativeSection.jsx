@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 
-const IntraOperativeSection = ({ formData, setFormData }) => {
+const IntraOperativeSection = ({ formData, setFormData,disabled }) => {
   const addIntraOperativeEntry = () => {
     setFormData(prev => ({
       ...prev,
@@ -76,6 +76,7 @@ const IntraOperativeSection = ({ formData, setFormData }) => {
                   <select
                     value={item.position}
                     onChange={(e) => handleIntraOperativeChange(index, 'position', e.target.value)}
+                    disabled={disabled}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                   >
                     <option value="">Select position</option>
@@ -92,6 +93,7 @@ const IntraOperativeSection = ({ formData, setFormData }) => {
                   <select
                     value={item.grade}
                     onChange={(e) => handleIntraOperativeChange(index, 'grade', e.target.value)}
+                    disabled={disabled}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                   >
                     <option value="">Select grade</option>
@@ -110,6 +112,7 @@ const IntraOperativeSection = ({ formData, setFormData }) => {
                     type="number"
                     value={item.energy}
                     onChange={(e) => handleIntraOperativeChange(index, 'energy', e.target.value)}
+                    disabled={disabled}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                     placeholder="Enter joules"
                   />

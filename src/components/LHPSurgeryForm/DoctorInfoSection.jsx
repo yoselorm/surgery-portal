@@ -1,7 +1,7 @@
 import React from 'react';
 import { User } from 'lucide-react';
 
-const DoctorInfoSection = ({ formData, onInputChange }) => {
+const DoctorInfoSection = ({ formData, onInputChange, disabled }) => {
   return (
     <div>
       {/* <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
@@ -55,8 +55,9 @@ const DoctorInfoSection = ({ formData, onInputChange }) => {
           <input
             type="date"
             name='date'
-            value={formData.date}
+            value={formData.date ? formData.date.split('T')[0] : ''}
             onChange={onInputChange}
+            disabled={disabled}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
           />
         </div>

@@ -20,8 +20,8 @@ export const updateSurgery = createAsyncThunk(
   'surgery/update',
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const res = await api.put(`${api_url_v1}/upadete-surgery/${id}`, data);
-      return res.data;
+      const res = await api.post(`${api_url_v1}/update-surgery/${id}`, data);
+      return res.data.surgery;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
     }
@@ -69,9 +69,6 @@ export const fetchSurgeryById = createAsyncThunk(
   }
 );
 
-/* =======================
-   SLICE
-======================= */
 
 const surgerySlice = createSlice({
   name: 'surgery',

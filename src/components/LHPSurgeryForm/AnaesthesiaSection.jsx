@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AnaesthesiaSection = ({ formData, onInputChange }) => {
+const AnaesthesiaSection = ({ formData, onInputChange,disabled }) => {
   return (
     <div className="pt-6 border-t border-gray-200">
       <h2 className="text-xl font-bold text-gray-900 mb-6">Anaesthesia</h2>
@@ -18,6 +18,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='generalAnaesthesia'
                 checked={formData.generalAnaesthesia === 'yes'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -29,6 +30,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='generalAnaesthesia'
                 checked={formData.generalAnaesthesia === 'no'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>
@@ -49,6 +51,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='regionalAnaesthesia'
                 checked={formData.regionalAnaesthesia === 'yes'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -60,6 +63,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='regionalAnaesthesia'
                 checked={formData.regionalAnaesthesia === 'no'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>
@@ -80,6 +84,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='localAnaesthesia'
                 checked={formData.localAnaesthesia === 'yes'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -91,6 +96,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='localAnaesthesia'
                 checked={formData.localAnaesthesia === 'no'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>
@@ -109,6 +115,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='spinalAnaesthesia'
                 checked={formData.spinalAnaesthesia === 'yes'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -120,6 +127,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='spinalAnaesthesia'
                 checked={formData.spinalAnaesthesia === 'no'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>
@@ -138,6 +146,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='saddleBlock'
                 checked={formData.saddleBlock === 'yes'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -149,6 +158,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='saddleBlock'
                 checked={formData.saddleBlock === 'no'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>
@@ -167,6 +177,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='pudendusBlock'
                 checked={formData.pudendusBlock === 'yes'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">Yes</span>
@@ -178,6 +189,7 @@ const AnaesthesiaSection = ({ formData, onInputChange }) => {
                 name='pudendusBlock'
                 checked={formData.pudendusBlock === 'no'}
                 onChange={onInputChange}
+                disabled={disabled}
                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
               />
               <span className="text-sm text-gray-700">No</span>

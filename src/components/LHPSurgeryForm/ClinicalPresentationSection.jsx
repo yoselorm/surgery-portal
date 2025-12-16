@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileText } from 'lucide-react';
 
-const ClinicalPresentationSection = ({ formData, onInputChange }) => {
+const ClinicalPresentationSection = ({ formData, onInputChange,disabled }) => {
   const symptoms = [
     { key: 'pain', label: 'PAIN' },
     { key: 'itching', label: 'ITCHING' },
@@ -52,6 +52,7 @@ const ClinicalPresentationSection = ({ formData, onInputChange }) => {
                       value={freq.value}
                       checked={formData.symptoms[symptom.key] === freq.value}
                       onChange={onInputChange}
+                      disabled={disabled}
                       className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
                     />
                   </td>

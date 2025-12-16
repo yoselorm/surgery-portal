@@ -1,7 +1,7 @@
 import React from 'react';
 import { Activity } from 'lucide-react';
 
-const VasScoreSection = ({ formData, onInputChange }) => {
+const VasScoreSection = ({ formData, onInputChange,disabled }) => {
   return (
     <div className="pt-6 border-t border-gray-200">
       <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
@@ -21,6 +21,7 @@ const VasScoreSection = ({ formData, onInputChange }) => {
               max="10"
               value={formData.vasScore}
               onChange={onInputChange}
+              disabled={disabled}
               className="flex-1 h-3 bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 rounded-lg appearance-none cursor-pointer"
             />
             <div className="w-20 text-center">

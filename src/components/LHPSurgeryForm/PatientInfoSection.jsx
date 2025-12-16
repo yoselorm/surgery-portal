@@ -1,7 +1,7 @@
 import React from 'react';
 import { User } from 'lucide-react';
 
-const PatientInfoSection = ({ formData, onInputChange }) => {
+const PatientInfoSection = ({ formData, onInputChange,disabled }) => {
   return (
     <div className="pt-6 border-t border-gray-200">
       <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center space-x-2">
@@ -18,6 +18,7 @@ const PatientInfoSection = ({ formData, onInputChange }) => {
             name="patientName" 
             value={formData.patientName}
             onChange={onInputChange}
+            disabled={disabled}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             placeholder="e.g., J.D."
           />
@@ -32,6 +33,7 @@ const PatientInfoSection = ({ formData, onInputChange }) => {
             name="patientAge" 
             value={formData.patientAge}
             onChange={onInputChange}
+            disabled={disabled}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
             placeholder="Enter age"
           />
@@ -45,6 +47,7 @@ const PatientInfoSection = ({ formData, onInputChange }) => {
             value={formData.gender}
             name="gender" 
             onChange={onInputChange}
+            disabled={disabled}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
           >
             <option value="">Select gender</option>

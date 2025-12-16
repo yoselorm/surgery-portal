@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar } from 'lucide-react';
 
-const FollowUpSection = ({ formData, setFormData }) => {
+const FollowUpSection = ({ formData, setFormData,disabled }) => {
   const followUpPeriods = [
     { key: 'twoWeeks', label: '2 Weeks' },
     { key: 'sixWeeks', label: '6 Weeks' },
@@ -65,6 +65,7 @@ const FollowUpSection = ({ formData, setFormData }) => {
                   type="checkbox"
                   checked={formData.followUp[period.key].completed}
                   onChange={(e) => handleFollowUpChange(period.key, 'completed', e.target.checked)}
+                  disabled={disabled}
                   className="w-5 h-5 text-cyan-600 rounded focus:ring-cyan-500"
                 />
                 <label className="text-sm font-semibold text-gray-900">
@@ -89,6 +90,7 @@ const FollowUpSection = ({ formData, setFormData }) => {
                     type="date"
                     value={formData.followUp[period.key].date}
                     onChange={(e) => handleFollowUpChange(period.key, 'date', e.target.value)}
+                    disabled={disabled}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                   />
                 </div>
@@ -106,6 +108,7 @@ const FollowUpSection = ({ formData, setFormData }) => {
                         max="10"
                         value={formData.followUp[period.key].vasScore || 0}
                         onChange={(e) => handleFollowUpChange(period.key, 'vasScore', e.target.value)}
+                        disabled={disabled}
                         className="flex-1 h-2 rounded-lg appearance-none cursor-pointer"
                         style={{
                           background: 'linear-gradient(to right, #10b981 0%, #fbbf24 50%, #ef4444 100%)'

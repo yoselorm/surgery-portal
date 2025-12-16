@@ -1,6 +1,6 @@
 import React from 'react';
 
-const TreatmentMethodsSection = ({ formData, setFormData }) => {
+const TreatmentMethodsSection = ({ formData, setFormData,disabled }) => {
   const treatmentMethods = [
     { key: 'medication', label: 'Medication' },
     { key: 'sclerosation', label: 'Sclerosation' },
@@ -35,6 +35,7 @@ const TreatmentMethodsSection = ({ formData, setFormData }) => {
               type="checkbox"
               checked={formData.treatmentMethods[method.key]}
               onChange={(e) => handleTreatmentMethodChange(method.key, e.target.checked)}
+              disabled={disabled}
               className="w-4 h-4 text-cyan-600 rounded focus:ring-cyan-500"
             />
             <span className="text-sm font-medium text-gray-700">{method.label}</span>
