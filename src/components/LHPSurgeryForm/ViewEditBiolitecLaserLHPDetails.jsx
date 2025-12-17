@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BiolitecLaserLHPForm from "./BiolitecLaserLHPForm";
 import { updateSurgery } from "../../redux/SurgerySlice";
+import toast from "../Toast";
 
-export const ViewEditBiolitecLaserLHP = ({ surgery, isEditing }) => {
+export const ViewEditBiolitecLaserLHP = ({ surgery, isEditing,setIsEditing }) => {
     const dispatch = useDispatch();
     const { loading } = useSelector((state) => state.surgeries);
   
@@ -12,22 +13,29 @@ export const ViewEditBiolitecLaserLHP = ({ surgery, isEditing }) => {
       patientName: surgery.patientName,
       patientAge: surgery.patientAge,
       gender: surgery.gender,
+      status:surgery.status,
       ...surgery.formData,
     }));
   
     const handleUpdate = async () => {
       if (!isEditing) return;
-  
-      await dispatch(updateSurgery({
-        id: surgery._id,
-        data: {
-          patientName: formData.patientName,
-          patientAge: Number(formData.patientAge),
-          gender: formData.gender,
-          date: formData.date,
-          formData: surgery.formData,
-        },
-      }));
+    
+      try {
+        await dispatch(updateSurgery({
+          id: surgery._id,
+          data: {
+            patientName: formData.patientName,
+            patientAge: Number(formData.patientAge),
+            gender: formData.gender,
+            date: formData.date,
+            formData: formData,
+          },
+        })).unwrap(); 
+        setIsEditing(false)
+        toast.success('Surgery record updated successfully!');
+      } catch (error) {
+        toast.error(error.message || 'Failed to update surgery record');
+      }
     };
   
     return (

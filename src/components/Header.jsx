@@ -9,22 +9,35 @@ import {
   LogOut,
   HelpCircle
 } from 'lucide-react';
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { logoutUser } from '../redux/AuthSlice';
+import toast from './Toast';
 
 const Header = () => {
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const { user } = useSelector((state) => state.auth)
+  const { user, loading } = useSelector((state) => state.auth)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
 
-  const notifications = [
-    { id: 1, text: 'New surgery scheduled for tomorrow', time: '5 min ago', unread: true },
-    { id: 2, text: 'Patient record updated successfully', time: '1 hour ago', unread: true },
-    { id: 3, text: 'Monthly report is ready', time: '2 hours ago', unread: false },
-  ];
+  const handleLogout = (e) => {
+    e.preventDefault();
+    setShowProfileMenu(false);
+  
+    dispatch(logoutUser())
+      .unwrap()
+      .then(() => {
+        navigate('/signin');
+        toast.success('Logged out successfully!');
+      });
+  };
+  
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const gotoProfile = () => {
+    setShowProfileMenu(false)
+    navigate('/dashboard/profile')
+  }
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
@@ -47,72 +60,10 @@ const Header = () => {
           <span className="font-medium text-sm">New Record</span>
         </button> */}
 
-        {/* Messages */}
-        <button className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">
-          <Mail className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
 
-        {/* Notifications */}
-        <div className="relative">
-          <button
-            onClick={() => {
-              setShowNotifications(!showNotifications);
-              setShowProfileMenu(false);
-            }}
-            className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition"
-          >
-            <Bell className="w-5 h-5" />
-            {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                {unreadCount}
-              </span>
-            )}
-          </button>
 
-          {/* Notifications Dropdown */}
-          {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-2xl border border-gray-200 z-50">
-              <div className="p-4 border-b border-gray-200">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-bold text-gray-900">Notifications</h3>
-                  <span className="text-xs text-cyan-600 font-semibold cursor-pointer hover:text-cyan-700">
-                    Mark all as read
-                  </span>
-                </div>
-              </div>
-              <div className="max-h-96 overflow-y-auto">
-                {notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${notification.unread ? 'bg-cyan-50' : ''
-                      }`}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <div className={`w-2 h-2 rounded-full mt-2 ${notification.unread ? 'bg-cyan-600' : 'bg-gray-300'}`}></div>
-                      <div className="flex-1">
-                        <p className={`text-sm ${notification.unread ? 'font-semibold text-gray-900' : 'text-gray-700'}`}>
-                          {notification.text}
-                        </p>
-                        <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="p-3 text-center border-t border-gray-200">
-                <a href="/notifications" className="text-sm text-cyan-600 font-semibold hover:text-cyan-700">
-                  View all notifications
-                </a>
-              </div>
-            </div>
-          )}
-        </div>
 
-        {/* Help */}
-        <button className="hidden lg:block p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition">
-          <HelpCircle className="w-5 h-5" />
-        </button>
+
 
         {/* Divider */}
         <div className="h-8 w-px bg-gray-300"></div>
@@ -146,11 +97,11 @@ const Header = () => {
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                  {user?.fullname
-                .split(" ")
-                .map((n) => n[0])
-                .join("")
-                .slice(0, 2)}
+                    {user?.fullname
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")
+                      .slice(0, 2)}
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">{user?.doctorId}</p>
@@ -160,30 +111,21 @@ const Header = () => {
               </div>
 
               <div className="py-2">
-                <Link to='/dashboard/profile'
-                  className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition"
+                <button
+                  onClick={gotoProfile}
+                  className="flex items-center w-full space-x-3 px-4 py-3 hover:bg-gray-50 transition"
                 >
                   <User className="w-4 h-4 text-gray-600" />
                   <span className="text-sm text-gray-700">My Profile</span>
-                </Link>
-                <a
-                  href="/settings"
-                  className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition"
-                >
-                  <Settings className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm text-gray-700">Settings</span>
-                </a>
-                <a
-                  href="/help"
-                  className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 transition"
-                >
-                  <HelpCircle className="w-4 h-4 text-gray-600" />
-                  <span className="text-sm text-gray-700">Help & Support</span>
-                </a>
+                </button>
+
               </div>
 
               <div className="border-t border-gray-200 py-2">
-                <button className="flex items-center space-x-3 px-4 py-3 w-full hover:bg-gray-50 transition text-left">
+                <button
+                  onClick={handleLogout}
+                  disabled={loading}
+                  className="flex items-center space-x-3 px-4 py-3 w-full hover:bg-gray-50 transition text-left">
                   <LogOut className="w-4 h-4 text-red-600" />
                   <span className="text-sm text-red-600 font-medium">Logout</span>
                 </button>

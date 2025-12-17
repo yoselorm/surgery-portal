@@ -8,7 +8,7 @@ const SurgeryDetailsPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const { currentSurgery, loading } = useSelector(
+  const { currentSurgery, loading} = useSelector(
     (state) => state.surgeries
   );
 
@@ -24,7 +24,12 @@ const SurgeryDetailsPage = () => {
   }, [id, dispatch]);
 
   if (loading) {
-    return <div>Loading surgery record...</div>;
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <p className="mt-4 text-gray-500 font-medium">Loading doctors...</p>
+      </div>
+    );
   }
 
   if (!currentSurgery) {

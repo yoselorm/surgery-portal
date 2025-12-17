@@ -8,11 +8,9 @@ const LHPSurgeryDetails = ({ currentSurgery, loading }) => {
 
   if (loading || !currentSurgery) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading surgery record...</p>
-        </div>
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        <p className="text-gray-500 font-medium">Loading...</p>
       </div>
     );
   }
@@ -189,6 +187,7 @@ const LHPSurgeryDetails = ({ currentSurgery, loading }) => {
         <ViewEditBiolitecLaserLHP
           surgery={currentSurgery}
           isEditing={isEditing}
+          setIsEditing={setIsEditing}
         />
       </div>
     </div>

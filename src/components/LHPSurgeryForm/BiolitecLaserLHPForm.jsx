@@ -60,6 +60,7 @@ const BiolitecLaserLHPForm = ({
     laserPower: '8W',
     laserPulseMode: '3.0s',
     medication: '',
+    status:'',
     diagnostics: {
       fissure: { observed: false, treated: false },
       skinTags: { observed: false, treated: false },
@@ -174,7 +175,7 @@ const BiolitecLaserLHPForm = ({
       date,
       procedure: 'Biolitec Laser LHP',
       surgeryType: 'Laser Surgery',
-      status: 'incomplete',
+      status: '',
       time: new Date().toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',

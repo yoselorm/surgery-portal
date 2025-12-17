@@ -2,7 +2,7 @@ import axios from "axios";
 import { api_url_v1 } from "./config";
 
 const api = axios.create({
-  baseURL: api_url_v1,
+  baseURL: '/',
   withCredentials: true, // allows cookies (refresh token)
 });
 
@@ -23,12 +23,12 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("/refresh-token")
+      !originalRequest.url.includes("api/refresh-token")
     ) {
       originalRequest._retry = true;
 
       try {
-        const res = await api.post("/refresh-token");
+        const res = await api.post("api/refresh-token");
 
         const newToken = res.data.accessToken;
         localStorage.setItem("accessToken", newToken);
@@ -37,8 +37,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         console.log("Refresh failed:", err);
-        // localStorage.removeItem("accessToken");
-        // window.location.href = "/";
+        localStorage.removeItem("accessToken");
+        window.location.href = "/";
       }
     }
 
