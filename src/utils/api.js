@@ -23,12 +23,12 @@ api.interceptors.response.use(
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes("api/refresh-token")
+      !originalRequest.url.includes("api/v1/refresh-token")
     ) {
       originalRequest._retry = true;
 
       try {
-        const res = await api.post("api/refresh-token");
+        const res = await api.post("api/v1/refresh-token");
 
         const newToken = res.data.accessToken;
         localStorage.setItem("accessToken", newToken);
@@ -37,8 +37,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         console.log("Refresh failed:", err);
-        localStorage.removeItem("accessToken");
-        window.location.href = "/";
+        // localStorage.removeItem("accessToken");
+        // window.location.href = "/";
       }
     }
 

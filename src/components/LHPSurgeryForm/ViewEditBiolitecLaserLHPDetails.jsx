@@ -13,12 +13,15 @@ export const ViewEditBiolitecLaserLHP = ({ surgery, isEditing,setIsEditing }) =>
       patientName: surgery.patientName,
       patientAge: surgery.patientAge,
       gender: surgery.gender,
-      status:surgery.status,
       ...surgery.formData,
     }));
   
     const handleUpdate = async () => {
       if (!isEditing) return;
+      if(surgery.status === 'complete'){
+        toast.error('Failed to update surgery record');
+        return
+      }
     
       try {
         await dispatch(updateSurgery({

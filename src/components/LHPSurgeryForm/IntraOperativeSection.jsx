@@ -59,13 +59,13 @@ const IntraOperativeSection = ({ formData, setFormData,disabled }) => {
             <div key={index} className="p-6 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Entry #{index + 1}</h3>
-                <button
+              { !disabled && <button
                   type="button"
                   onClick={() => removeIntraOperativeEntry(index)}
                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
                 >
                   <Trash2 className="w-5 h-5" />
-                </button>
+                </button>}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

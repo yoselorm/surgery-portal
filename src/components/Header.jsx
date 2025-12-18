@@ -23,16 +23,16 @@ const Header = () => {
 
   const handleLogout = (e) => {
     e.preventDefault();
-    setShowProfileMenu(false);
-  
+
     dispatch(logoutUser())
       .unwrap()
       .then(() => {
+        setShowProfileMenu(false);
         navigate('/signin');
         toast.success('Logged out successfully!');
       });
   };
-  
+
 
   const gotoProfile = () => {
     setShowProfileMenu(false)
@@ -73,7 +73,6 @@ const Header = () => {
           <button
             onClick={() => {
               setShowProfileMenu(!showProfileMenu);
-              setShowNotifications(false);
             }}
             className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded-lg transition"
           >
@@ -125,11 +124,46 @@ const Header = () => {
                 <button
                   onClick={handleLogout}
                   disabled={loading}
-                  className="flex items-center space-x-3 px-4 py-3 w-full hover:bg-gray-50 transition text-left">
-                  <LogOut className="w-4 h-4 text-red-600" />
-                  <span className="text-sm text-red-600 font-medium">Logout</span>
+                  className={`flex items-center space-x-3 px-4 py-3 w-full transition text-left
+      ${loading ? 'cursor-not-allowed opacity-70' : 'hover:bg-red-50'}`}
+                >
+                  {loading ? (
+                    <>
+                      {/* Spinner */}
+                      <svg
+                        className="w-4 h-4 animate-spin text-red-600"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+
+                      <span className="text-sm text-red-600 font-medium">
+                        Logging out...
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="w-4 h-4 text-red-600" />
+                      <span className="text-sm text-red-600 font-medium">Logout</span>
+                    </>
+                  )}
                 </button>
               </div>
+
             </div>
           )}
         </div>

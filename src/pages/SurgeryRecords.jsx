@@ -158,10 +158,8 @@ const SurgeryRecords = () => {
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
           >
             <option value="all">All Status</option>
-            <option value="completed">Completed</option>
+            <option value="complete">Completed</option>
             <option value="incomplete">Incomplete</option>
-            <option value="in-progress">In Progress</option>
-            <option value="scheduled">Scheduled</option>
           </select>
 
           {/* Export Button */}

@@ -137,7 +137,7 @@ const LHPSurgeryDetails = ({ currentSurgery, loading }) => {
                 </span>
               </button>
 
-              <button
+          {  currentSurgery?.status === 'incomplete' &&  <button
                 onClick={() => setIsEditing((prev) => !prev)}
                 className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition font-medium ${
                   isEditing
@@ -156,7 +156,7 @@ const LHPSurgeryDetails = ({ currentSurgery, loading }) => {
                     <span className="text-sm">Edit Record</span>
                   </>
                 )}
-              </button>
+              </button>}
             </div>
           </div>
         </div>

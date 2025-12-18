@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ArrowLeft, Activity, Save, Send } from 'lucide-react';
-import { createSurgery } from '../../redux/SurgerySlice';
+import { createSurgery, updateSurgery } from '../../redux/SurgerySlice';
 
 import FormHeader from './FormHeader';
 import DoctorInfoSection from './DoctorInfoSection';
@@ -16,6 +16,7 @@ import AnaesthesiaSection from './AnaesthesiaSection';
 import LaserSettingsSection from './LaserSettingsSection';
 import IntraOperativeSection from './IntraOperativeSection';
 import PostOperativeMedicationSection from './PostOperativeMedicationSection';
+import ConfirmationModal from '../ConfirmationModal';
 
 const BiolitecLaserLHPForm = ({
   // Props for edit mode
@@ -30,7 +31,10 @@ const BiolitecLaserLHPForm = ({
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading: reduxLoading } = useSelector((state) => state.surgeries);
+  const { loading: reduxLoading ,currentSurgery} = useSelector((state) => state.surgeries);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { id } = useParams()
+
 
   // Determine if we're in edit mode or create mode
   const isEditMode = !!externalFormData;
@@ -60,7 +64,6 @@ const BiolitecLaserLHPForm = ({
     laserPower: '8W',
     laserPulseMode: '3.0s',
     medication: '',
-    status:'',
     diagnostics: {
       fissure: { observed: false, treated: false },
       skinTags: { observed: false, treated: false },
@@ -175,7 +178,6 @@ const BiolitecLaserLHPForm = ({
       date,
       procedure: 'Biolitec Laser LHP',
       surgeryType: 'Laser Surgery',
-      status: '',
       time: new Date().toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
@@ -192,7 +194,11 @@ const BiolitecLaserLHPForm = ({
     }
   };
 
-  const handleSaveDraft = async () => {
+  const handleSave = async () => {
+      if(currentSurgery.status === 'complete'){
+       showBadge('error', 'Already completed');
+        return
+      }
     try {
       const {
         patientName,
@@ -203,21 +209,24 @@ const BiolitecLaserLHPForm = ({
       } = formData;
 
       await dispatch(
-        createSurgery({
-          patientName,
-          patientAge: Number(patientAge),
-          gender,
-          date,
-          procedure: 'Biolitec Laser LHP',
-          surgeryType: 'Laser Surgery',
-          status: 'incomplete',
-          formData: clinicalFormData,
+        updateSurgery({
+          id: id,
+          data: {
+            patientName,
+            patientAge: Number(patientAge),
+            gender,
+            date,
+            procedure: 'Biolitec Laser LHP',
+            surgeryType: 'Laser Surgery',
+            status: 'complete',
+            formData: clinicalFormData,
+          },
         })
       ).unwrap();
 
-      showBadge('info', 'Draft saved');
+      showBadge('info', 'Record saved successfully');
     } catch (err) {
-      showBadge('error', 'Failed to save draft');
+      showBadge('error', 'Failed to save record');
     }
   };
 
@@ -341,17 +350,18 @@ const BiolitecLaserLHPForm = ({
 
           {/* Action Buttons */}
           <div className="pt-8 border-t border-gray-200 flex items-center justify-between">
-            {showDraft && (
+            {isEditMode && (
               <button
                 type="button"
-                onClick={handleSaveDraft}
-                disabled={disabled}
+                onClick={() => setIsModalOpen(true)}
+                // disabled={disabled}
                 className="flex items-center space-x-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-5 h-5" />
-                <span>Save as Draft</span>
+                <span>Save as Completed</span>
               </button>
             )}
+
 
             <button
               type="submit"
@@ -365,6 +375,17 @@ const BiolitecLaserLHPForm = ({
           </div>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleSave}
+        title="Complete Surgery Record"
+        message="This action will save this record and no further edits can be made. This cannot be undone."
+        confirmText="Yes, Confirm"
+        cancelText="Cancel"
+        type="warning"
+      />
     </div>
   );
 };

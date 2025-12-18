@@ -146,6 +146,7 @@ const FollowUpSection = ({ formData, setFormData,disabled }) => {
                                 value="yes"
                                 checked={formData.followUp[period.key].symptoms?.[symptom.key] === 'yes'}
                                 onChange={(e) => handleSymptomChange(period.key, symptom.key, e.target.value)}
+                                disabled={disabled}
                                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
                               />
                               <span className="text-sm text-gray-700">Yes</span>
@@ -157,6 +158,7 @@ const FollowUpSection = ({ formData, setFormData,disabled }) => {
                                 value="no"
                                 checked={formData.followUp[period.key].symptoms?.[symptom.key] === 'no'}
                                 onChange={(e) => handleSymptomChange(period.key, symptom.key, e.target.value)}
+                                disabled={disabled}
                                 className="w-4 h-4 text-cyan-600 focus:ring-cyan-500"
                               />
                               <span className="text-sm text-gray-700">No</span>
@@ -176,6 +178,7 @@ const FollowUpSection = ({ formData, setFormData,disabled }) => {
                   <textarea
                     value={formData.followUp[period.key].notes}
                     onChange={(e) => handleFollowUpChange(period.key, 'notes', e.target.value)}
+                    disabled={disabled}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
                     rows="3"
                     placeholder="Enter follow-up notes or observations"
