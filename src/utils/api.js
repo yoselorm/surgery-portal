@@ -1,5 +1,6 @@
 import axios from "axios";
 import { api_url_v1 } from "./config";
+import toast from "../components/Toast";
 
 const api = axios.create({
   baseURL: api_url_v1,
@@ -39,6 +40,7 @@ api.interceptors.response.use(
         console.log("Refresh failed:", err);
         localStorage.removeItem("accessToken");
         window.location.href = "/";
+        toast.warning('Session Expired')
       }
     }
 

@@ -33,7 +33,7 @@ export const ViewEditBiolitecLaserLHP = ({ surgery, isEditing, setIsEditing }) =
           patientAge: Number(patientAge),
           gender,
           date,
-          status: surgery.status, // Keep the same status
+          status: 'follow-ups',
           formData: clinicalFormData,
         },
       })).unwrap(); 
