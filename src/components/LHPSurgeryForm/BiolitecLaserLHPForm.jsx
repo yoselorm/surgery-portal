@@ -202,10 +202,10 @@ const BiolitecLaserLHPForm = ({
       date,
       ...clinicalFormData
     } = formData;
-
+  
     const payload = {
       patientName,
-      patientAge: Number(patientAge),
+      patientAge: patientAge ? Number(patientAge) : null,
       gender,
       date,
       procedure: 'Biolitec Laser LHP',
@@ -217,15 +217,26 @@ const BiolitecLaserLHPForm = ({
       }),
       formData: clinicalFormData,
     };
-
+  
     try {
-      await dispatch(createSurgery(payload)).unwrap();
+      if (id) {
+        await dispatch(updateSurgery({ id, data: payload })).unwrap();
+      } else {
+        await dispatch(createSurgery(payload)).unwrap();
+      }
+    
       toast.success('Surgery record saved as draft successfully');
-      setTimeout(() => navigate(-1), 1200);
+      navigate(-1)
     } catch (err) {
-      toast.error(err?.message || 'Failed to save surgery record');
+      toast.error(
+        err?.data?.message ||
+        err?.message ||
+        'Failed to save surgery record'
+      );
     }
+    
   };
+  
 
   const handleSaveAsCompleted = async () => {
     if (currentStatus === 'complete') {
