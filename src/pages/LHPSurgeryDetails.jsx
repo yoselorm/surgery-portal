@@ -27,21 +27,29 @@ const LHPSurgeryDetails = ({ currentSurgery, loading }) => {
           borderClass: 'border-green-300',
           label: 'Completed'
         };
-      case 'in-progress':
-      case 'in progress':
+      case 'follow-ups':
+      case 'follow ups':
         return {
           color: 'blue',
           bgClass: 'bg-blue-100',
           textClass: 'text-blue-800',
           borderClass: 'border-blue-300',
-          label: 'In Progress'
+          label: 'Follow ups'
         };
-      case 'scheduled':
+      case 'draft':
         return {
           color: 'yellow',
           bgClass: 'bg-yellow-100',
           textClass: 'text-yellow-800',
           borderClass: 'border-yellow-300',
+          label: 'Draft'
+        };
+      case 'scheduled':
+        return {
+          color: 'purple',
+          bgClass: 'bg-purple-100',
+          textClass: 'text-purple-800',
+          borderClass: 'border-purple-300',
           label: 'Scheduled'
         };
       case 'incomplete':
@@ -74,6 +82,9 @@ const LHPSurgeryDetails = ({ currentSurgery, loading }) => {
       day: 'numeric' 
     });
   };
+
+  // Determine if Edit button should be shown
+  const canEdit = currentSurgery.status === 'draft';
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -119,8 +130,6 @@ const LHPSurgeryDetails = ({ currentSurgery, loading }) => {
                     <p className="font-semibold text-gray-900">{formatDate(currentSurgery.date)}</p>
                   </div>
                 </div>
-
-             
               </div>
             </div>
 
@@ -137,26 +146,29 @@ const LHPSurgeryDetails = ({ currentSurgery, loading }) => {
                 </span>
               </button>
 
-          {  currentSurgery?.status === 'incomplete' &&  <button
-                onClick={() => setIsEditing((prev) => !prev)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition font-medium ${
-                  isEditing
-                    ? 'bg-red-50 text-red-600 border border-red-300 hover:bg-red-100'
-                    : 'bg-cyan-600 text-white hover:bg-cyan-700 shadow-sm'
-                }`}
-              >
-                {isEditing ? (
-                  <>
-                    <X className="w-5 h-5" />
-                    <span className="text-sm">Cancel</span>
-                  </>
-                ) : (
-                  <>
-                    <Edit2 className="w-5 h-5" />
-                    <span className="text-sm">Edit Record</span>
-                  </>
-                )}
-              </button>}
+              {/* Edit button - only show for draft status */}
+              {canEdit && (
+                <button
+                  onClick={() => setIsEditing((prev) => !prev)}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition font-medium ${
+                    isEditing
+                      ? 'bg-red-50 text-red-600 border border-red-300 hover:bg-red-100'
+                      : 'bg-cyan-600 text-white hover:bg-cyan-700 shadow-sm'
+                  }`}
+                >
+                  {isEditing ? (
+                    <>
+                      <X className="w-5 h-5" />
+                      <span className="text-sm">Cancel</span>
+                    </>
+                  ) : (
+                    <>
+                      <Edit2 className="w-5 h-5" />
+                      <span className="text-sm">Edit Record</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -179,6 +191,21 @@ const LHPSurgeryDetails = ({ currentSurgery, loading }) => {
             </div>
             <p className="text-xs text-blue-700 mt-1">
               Make your changes below and click "Update Record" to save.
+            </p>
+          </div>
+        )}
+
+        {/* Status Info Banner */}
+        {!isEditing && (
+          <div className={`mb-6 border rounded-lg p-4 ${
+            currentSurgery.status === 'complete' ? 'bg-green-50 border-green-200' :
+            currentSurgery.status === 'follow-ups' ? 'bg-blue-50 border-blue-200' :
+            'bg-yellow-50 border-yellow-200'
+          }`}>
+            <p className="text-sm font-medium">
+              {currentSurgery.status === 'complete' && '✅ This record is completed and locked.'}
+              {currentSurgery.status === 'follow-ups' && '📅 Only follow-up sections can be edited for this record.'}
+              {currentSurgery.status === 'draft' && '✏️ This is a draft record. Click "Edit Record" to make changes.'}
             </p>
           </div>
         )}

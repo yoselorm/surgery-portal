@@ -59,7 +59,7 @@ const OverviewPage = () => {
   const getStatusBadge = (status) => {
     const statusConfig = {
       complete: { label: 'Complete', color: 'bg-green-100 text-green-700' },
-      incomplete: { label: 'Incomplete', color: 'bg-yellow-100 text-yellow-700' }
+      followUps: { label: 'Follow Ups', color: 'bg-yellow-100 text-yellow-700' }
     };
 
     const config = statusConfig[status] || { label: status, color: 'bg-gray-100 text-gray-700' };
@@ -109,7 +109,7 @@ const OverviewPage = () => {
       change: dashboardData?.summary?.completionRateInRange || '0%'
     },
     {
-      title: 'Incomplete',
+      title: 'Draft',
       value: dashboardData?.summary?.incompleteSurgeries || 0,
       icon: Clock,
       bgColor: 'bg-yellow-100',
@@ -289,8 +289,15 @@ const OverviewPage = () => {
 
             <div className="border-l-4 border-yellow-600 bg-yellow-50 p-4 rounded-r-lg">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-semibold text-yellow-700">Incomplete</span>
+                <span className="text-sm font-semibold text-yellow-700">Draft</span>
                 <span className="text-2xl font-bold text-yellow-700">{quickStats?.incompleteSurgeries || 0}</span>
+              </div>
+              <p className="text-xs text-gray-600">Pending completion</p>
+            </div>
+            <div className="border-l-4 border-gray-600 bg-gray-50 p-4 rounded-r-lg">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-sm font-semibold text-gray-700">Follow Ups</span>
+                <span className="text-2xl font-bold text-gray-700">{quickStats?.followUps || 0}</span>
               </div>
               <p className="text-xs text-gray-600">Pending completion</p>
             </div>

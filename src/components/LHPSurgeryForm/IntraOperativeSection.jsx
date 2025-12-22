@@ -1,14 +1,16 @@
 import React from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 
-const IntraOperativeSection = ({ formData, setFormData,disabled }) => {
+const IntraOperativeSection = ({ formData, setFormData, disabled }) => {
   const addIntraOperativeEntry = () => {
     setFormData(prev => ({
       ...prev,
       intraOperativeData: [...prev.intraOperativeData, {
         position: '',
         grade: '',
-        energy: ''
+        energy: '',
+        hal: 'no',
+        mucopexy: 'no'
       }]
     }));
   };
@@ -42,7 +44,8 @@ const IntraOperativeSection = ({ formData, setFormData,disabled }) => {
         <button
           type="button"
           onClick={addIntraOperativeEntry}
-          className="flex items-center space-x-2 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition"
+          disabled={disabled}
+          className="flex items-center space-x-2 px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Plus className="w-4 h-4" />
           <span>Add More</span>
@@ -59,16 +62,18 @@ const IntraOperativeSection = ({ formData, setFormData,disabled }) => {
             <div key={index} className="p-6 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-semibold text-gray-900">Entry #{index + 1}</h3>
-              { !disabled && <button
-                  type="button"
-                  onClick={() => removeIntraOperativeEntry(index)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>}
+                {!disabled && (
+                  <button
+                    type="button"
+                    onClick={() => removeIntraOperativeEntry(index)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Position of Haemorrhoid (Clock)
@@ -77,7 +82,7 @@ const IntraOperativeSection = ({ formData, setFormData,disabled }) => {
                     value={item.position}
                     onChange={(e) => handleIntraOperativeChange(index, 'position', e.target.value)}
                     disabled={disabled}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     <option value="">Select position</option>
                     {[...Array(12)].map((_, i) => (
@@ -94,7 +99,7 @@ const IntraOperativeSection = ({ formData, setFormData,disabled }) => {
                     value={item.grade}
                     onChange={(e) => handleIntraOperativeChange(index, 'grade', e.target.value)}
                     disabled={disabled}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     <option value="">Select grade</option>
                     <option value="I">Grade I</option>
@@ -113,9 +118,76 @@ const IntraOperativeSection = ({ formData, setFormData,disabled }) => {
                     value={item.energy}
                     onChange={(e) => handleIntraOperativeChange(index, 'energy', e.target.value)}
                     disabled={disabled}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                     placeholder="Enter joules"
                   />
+                </div>
+              </div>
+
+              {/* HAL and mucopexy Options */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-300">
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    HAL (Hemorrhoidal Artery Ligation)
+                  </label>
+                  <div className="flex space-x-6">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`hal_${index}`}
+                        value="yes"
+                        checked={item.hal === 'yes'}
+                        onChange={(e) => handleIntraOperativeChange(index, 'hal', e.target.value)}
+                        disabled={disabled}
+                        className="w-4 h-4 text-cyan-600 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      />
+                      <span className="text-sm font-medium text-gray-700">Yes</span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`hal_${index}`}
+                        value="no"
+                        checked={item.hal === 'no'}
+                        onChange={(e) => handleIntraOperativeChange(index, 'hal', e.target.value)}
+                        disabled={disabled}
+                        className="w-4 h-4 text-cyan-600 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      />
+                      <span className="text-sm font-medium text-gray-700">No</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Mucopexy
+                  </label>
+                  <div className="flex space-x-6">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`mucopexy_${index}`}
+                        value="yes"
+                        checked={item.mucopexy === 'yes'}
+                        onChange={(e) => handleIntraOperativeChange(index, 'mucopexy', e.target.value)}
+                        disabled={disabled}
+                        className="w-4 h-4 text-cyan-600 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      />
+                      <span className="text-sm font-medium text-gray-700">Yes</span>
+                    </label>
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name={`mucopexy_${index}`}
+                        value="no"
+                        checked={item.mucopexy === 'no'}
+                        onChange={(e) => handleIntraOperativeChange(index, 'mucopexy', e.target.value)}
+                        disabled={disabled}
+                        className="w-4 h-4 text-cyan-600 focus:ring-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      />
+                      <span className="text-sm font-medium text-gray-700">No</span>
+                    </label>
+                  </div>
                 </div>
               </div>
             </div>

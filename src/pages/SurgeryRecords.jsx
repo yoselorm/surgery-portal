@@ -61,10 +61,10 @@ const SurgeryRecords = () => {
       case 'completed':
       case 'complete':
         return 'green';
-      case 'in-progress':
-      case 'in progress':
+      case 'follow-ups':
+      case 'follow ups':
         return 'blue';
-      case 'scheduled':
+      case 'draft':
         return 'yellow';
       case 'incomplete':
         return 'red';
@@ -159,7 +159,8 @@ const SurgeryRecords = () => {
           >
             <option value="all">All Status</option>
             <option value="complete">Completed</option>
-            <option value="incomplete">Incomplete</option>
+            <option value="draft">Draft</option>
+            <option value="follow-ups">Follow Ups</option>
           </select>
 
           {/* Export Button */}
