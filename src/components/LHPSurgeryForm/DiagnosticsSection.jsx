@@ -14,17 +14,40 @@ const DiagnosticsSection = ({ formData, setFormData,disabled }) => {
     { key: 'analVeinThrombosis', label: 'Anal Vein Thrombosis' }
   ];
 
+  // const handleDiagnosticChange = (diagnostic, field, value) => {
+  //   setFormData(prev => ({
+  //     ...prev,
+  //     diagnostics: {
+  //       ...prev.diagnostics,
+  //       [diagnostic]: {
+  //         ...prev.diagnostics[diagnostic],
+  //         [field]: value
+  //       }
+  //     }
+  //   }));
+  // };
+
+
   const handleDiagnosticChange = (diagnostic, field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      diagnostics: {
-        ...prev.diagnostics,
-        [diagnostic]: {
-          ...prev.diagnostics[diagnostic],
-          [field]: value
-        }
+    setFormData(prev => {
+      const updates = { [field]: value };
+      
+      // If treated is being checked, automatically check observed
+      if (field === 'treated' && value === true) {
+        updates.observed = true;
       }
-    }));
+      
+      return {
+        ...prev,
+        diagnostics: {
+          ...prev.diagnostics,
+          [diagnostic]: {
+            ...prev.diagnostics[diagnostic],
+            ...updates
+          }
+        }
+      };
+    });
   };
 
   return (

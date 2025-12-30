@@ -11,23 +11,25 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../redux/AuthSlice';
 import toast from './Toast';
+import wlogo from '../assets/isplogowhite.svg'
+
 
 const Sidebar = ({ collapsed, setCollapsed }) => {
   const { pathname } = useLocation();
   const navigate = useNavigate()
-  const { user,loading } = useSelector((state) => state.auth)
+  const { user, loading } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
 
-const handleLogout = (e) => {
-  e.preventDefault();
+  const handleLogout = (e) => {
+    e.preventDefault();
 
-  dispatch(logoutUser())
-    .unwrap()
-    .then(() => {
-      navigate('/signin');
-      toast.success('Logged out successfully!');
-    });
-};
+    dispatch(logoutUser())
+      .unwrap()
+      .then(() => {
+        navigate('/signin');
+        toast.success('Logged out successfully!');
+      });
+  };
   const menuItems = [
     { icon: Home, label: 'Dashboard', path: '/dashboard' },
     { icon: FileText, label: 'Surgery Records', path: '/dashboard/records' },
@@ -39,12 +41,18 @@ const handleLogout = (e) => {
         } bg-gradient-to-b from-cyan-700 to-blue-800 text-white transition-all duration-300 flex flex-col h-screen relative`}
     >
       {/* Logo */}
-      <div className="p-6 flex items-center justify-between border-b border-cyan-600">
+      <div className="p-2 flex items-center justify-between border-b border-cyan-600">
         <div className="flex items-center space-x-3">
-          <div className="bg-white p-2 rounded-lg">
+          {/* <div className="bg-white p-2 rounded-lg">
             <Activity className="w-6 h-6 text-cyan-700" />
+          </div> */}
+          <div>
+            <img
+              src={wlogo}
+              className='h-16 w-16'
+            />
           </div>
-          {!collapsed && <span className="text-2xl font-bold">Isolp</span>}
+          {!collapsed && <span className="text-2xl font-bold">SurgSuite</span>}
         </div>
       </div>
 
@@ -67,8 +75,8 @@ const handleLogout = (e) => {
               key={index}
               to={item.path}
               className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition group ${isActive
-                  ? 'bg-white text-cyan-700 shadow-md'
-                  : 'text-cyan-100 hover:bg-cyan-600'
+                ? 'bg-white text-cyan-700 shadow-md'
+                : 'text-cyan-100 hover:bg-cyan-600'
                 }`}
             >
               <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-cyan-700' : ''}`} />
@@ -88,7 +96,7 @@ const handleLogout = (e) => {
         {!collapsed ? (
           <div className="flex items-center space-x-3 mb-4">
             <div className="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center font-bold">
-            {user?.fullname
+              {user?.fullname
                 .split(" ")
                 .map((n) => n[0])
                 .join("")
@@ -112,12 +120,12 @@ const handleLogout = (e) => {
         )}
 
         <button
-        type='submit'
-            onClick={handleLogout}
-            disabled={loading}
+          type='submit'
+          onClick={handleLogout}
+          disabled={loading}
           className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-lg transition">
           <LogOut className="w-4 h-4" />
-          {!collapsed && <span className="text-sm font-medium">{loading ? "Logging out...":"Logout"}</span>}
+          {!collapsed && <span className="text-sm font-medium">{loading ? "Logging out..." : "Logout"}</span>}
         </button>
       </div>
     </div>
