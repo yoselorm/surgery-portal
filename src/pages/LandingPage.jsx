@@ -20,7 +20,7 @@ const LandingPage = () => {
                   className='h-20 w-20'
                 />
               </div>
-              <span className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">SurgSuite</span>
+              <span className="text-3xl font-bold bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">SurgiDesk</span>
             </div>
 
             {/* Desktop Navigation */}
@@ -304,7 +304,7 @@ const LandingPage = () => {
                 className='h-20 w-20'
               />
             </div>
-            <span className="text-2xl font-bold text-white">SurgSuite</span>
+            <span className="text-2xl font-bold text-white">SurgiDesk</span>
           </div>
           <p className="text-sm leading-relaxed">
             Empowering the ISOLP community with advanced tools for surgical data management and research excellence.
@@ -336,7 +336,7 @@ const LandingPage = () => {
         </div>
       </div>
       <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-        <p className="text-sm">&copy; 2024 SurgSuite. All rights reserved.</p>
+        <p className="text-sm">&copy; 2024 SurgiDesk. All rights reserved.</p>
         <a
           href="https://nexaura.agency/"
           target="_blank"

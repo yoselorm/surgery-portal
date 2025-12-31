@@ -52,7 +52,7 @@ const Sidebar = ({ collapsed, setCollapsed }) => {
               className='h-16 w-16'
             />
           </div>
-          {!collapsed && <span className="text-2xl font-bold">SurgSuite</span>}
+          {!collapsed && <span className="text-2xl font-bold">SurgiDesk</span>}
         </div>
       </div>
 
