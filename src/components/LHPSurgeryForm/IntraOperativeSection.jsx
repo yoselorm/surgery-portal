@@ -102,10 +102,10 @@ const IntraOperativeSection = ({ formData, setFormData, disabled }) => {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     <option value="">Select grade</option>
-                    <option value="I">Grade I</option>
-                    <option value="II">Grade II</option>
-                    <option value="III">Grade III</option>
-                    <option value="IV">Grade IV</option>
+                    <option value="1">Grade I</option>
+                    <option value="2">Grade II</option>
+                    <option value="3">Grade III</option>
+                    <option value="4">Grade IV</option>
                   </select>
                 </div>
 

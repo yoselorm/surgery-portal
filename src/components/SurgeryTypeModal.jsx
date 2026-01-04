@@ -77,8 +77,8 @@ const SurgeryTypeModal = ({ isOpen, onClose, onSelectSurgery }) => {
     },
     {
       id: 6,
-      name: 'AiN / Condylomata',
-      fullName: 'Anal Intraepithelial Neoplasia Treatment',
+      name: 'LaCAiNA',
+      fullName: 'Laser assisted Condylomata and AiN Ablation',
       icon: CircleDot,
       color: 'pink',
       description: 'Treatment for AiN and condylomata',

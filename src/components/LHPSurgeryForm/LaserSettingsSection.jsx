@@ -21,39 +21,37 @@ const LaserSettingsSection = ({ formData, onInputChange,disabled }) => {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
           >
             <option value="1470nm">1470nm</option>
-            <option value="1-2">1-2</option>
-            <option value="2-3">2-3</option>
-            <option value="3">3</option>
+            <option value="1940nm">1940nm</option>
           </select>
         </div>
 
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Laser Power
+            Laser Power (W)
           </label>
           <input
-            type="text"
+            type="number"
             value={formData.laserPower}
             name='laserPower'
             onChange={onInputChange}
             disabled={disabled}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-            placeholder="e.g., 8W"
+            placeholder="e.g., 8"
           />
         </div>
 
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Laser Pulse Mode (Ontime)
+            Laser Pulse Mode (Ontime) in seconds
           </label>
           <input
-            type="text"
+            type="number"
             value={formData.laserPulseMode}
             name='laserPulseMode'
             onChange={onInputChange}
             disabled={disabled}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-            placeholder="e.g., 3.0s"
+            placeholder="e.g., 3.0"
           />
         </div>
       </div>

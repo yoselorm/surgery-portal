@@ -130,7 +130,7 @@ const LandingPage = () => {
                 />
 
                 {/* Overlay Stats Card */}
-                <div className="absolute -top-6 -right-6 bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-6 rounded-2xl shadow-2xl">
+                {/* <div className="absolute -top-6 -right-6 bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-6 rounded-2xl shadow-2xl">
                   <div className="flex items-center space-x-3 mb-3">
                     <TrendingUp className="w-8 h-8" />
                     <div>
@@ -138,7 +138,7 @@ const LandingPage = () => {
                       <p className="text-3xl font-bold">24</p>
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Bottom Card */}
               
@@ -336,7 +336,7 @@ const LandingPage = () => {
         </div>
       </div>
       <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-        <p className="text-sm">&copy; 2024 SurgiDesk. All rights reserved.</p>
+        <p className="text-sm">&copy; 2025 SurgiDesk. All rights reserved.</p>
         <a
           href="https://nexaura.agency/"
           target="_blank"

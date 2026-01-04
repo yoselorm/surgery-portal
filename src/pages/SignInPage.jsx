@@ -194,7 +194,7 @@ const SignInPage = () => {
 
         {/* Footer */}
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Protected by industry-leading security standards</p>
+          {/* <p>Protected by industry-leading security standards</p> */}
           {/* <div className="flex justify-center items-center space-x-4 mt-2">
             <span className="flex items-center space-x-1">
               <Lock className="w-3 h-3" />
