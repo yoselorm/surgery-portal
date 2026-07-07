@@ -5,10 +5,12 @@ import { api_url_v1 } from "../utils/config";
 import axios from "axios";
 import { updateDoctor } from "./ProfileSlice";
 
-// Get user from localStorage if exists
-const userFromStorage = localStorage.getItem('user')
-    ? JSON.parse(localStorage.getItem('user'))
-    : null;
+// Safe JSON parser helper
+const getStoredItem = (key, isJson = false) => {
+  const item = localStorage.getItem(key);
+  if (!item) return null;
+  return isJson ? JSON.parse(item) : item;
+};
 
 // ---- user LOGIN ---- //
 export const userLogin = createAsyncThunk(
@@ -17,8 +19,9 @@ export const userLogin = createAsyncThunk(
     try {
       const res = await axios.post(`${api_url_v1}/user-login`, { email, password });
 
-      // Save accessToken and user data
+      // FIXED: Storing both tokens as expected by your stateless backend
       localStorage.setItem("accessToken", res?.data?.accessToken);
+      localStorage.setItem("refreshToken", res?.data?.refreshToken);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
       return res.data; 
@@ -30,6 +33,7 @@ export const userLogin = createAsyncThunk(
   }
 );
 
+// ---- update PASSWORD ---- //
 export const updatePassword = createAsyncThunk(
     "auth/updatePassword",
     async ({ currentPassword, newPassword, confirmPassword }, { rejectWithValue }) => {
@@ -40,10 +44,10 @@ export const updatePassword = createAsyncThunk(
           confirmPassword
         });
   
-        return 
+        return res.data; // Added return statement to explicitly pass success message
       } catch (err) {
         return rejectWithValue(
-          err.response?.data?.message || "Failed to update password"
+          err.response?.data?.error || err.response?.data?.message || "Failed to update password"
         );
       }
     }
@@ -54,19 +58,19 @@ export const logoutUser = createAsyncThunk(
     "auth/logoutUser",
     async (_, { rejectWithValue }) => {
       try {
-        await api.post(`${api_url_v1}/logout`);
-        
-        // Clear localStorage
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("user");
+        // FIXED: Passing the refresh token to the backend so it can be wiped from the database
+        const refreshToken = localStorage.getItem("refreshToken");
+        await api.post(`${api_url_v1}/logout`, { refreshToken });
         
         return true;
       } catch (err) {
-        console.log(err);
-        // Clear localStorage even if API call fails
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("user");
+        console.error("Logout API error:", err);
         return rejectWithValue("Logout failed");
+      } finally {
+        // ALWAYS wipe local tokens regardless of whether network request succeeded or timed out
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("user");
       }
     }
 );
@@ -74,11 +78,12 @@ export const logoutUser = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: userFromStorage, 
+    user: getStoredItem('user', true), 
+    accessToken: getStoredItem('accessToken'),
+    refreshToken: getStoredItem('refreshToken'),
     loading: false,
     error: null,
     isSuccess: false,
-    accessToken:localStorage.getItem('accessToken'),
     passwordUpdateSuccess: false,
     passwordUpdateLoading: false,
     passwordUpdateError: null,
@@ -86,16 +91,31 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
+      state.accessToken = null;
+      state.refreshToken = null;
       state.isSuccess = false;
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
       localStorage.removeItem("user");
     },
     clearError: (state) => {
       state.error = null;
     },
-    // Update access token after refresh
+    // FIXED: Added missing reducer to match your bottom export
+    clearPasswordUpdate: (state) => {
+      state.passwordUpdateSuccess = false;
+      state.passwordUpdateError = null;
+    },
+    // Sync tokens after token rotation interceptor fires
     refreshAccessToken: (state, action) => {
-      localStorage.setItem('accessToken', action.payload);
+      const { accessToken, refreshToken } = action.payload;
+      state.accessToken = accessToken;
+      localStorage.setItem('accessToken', accessToken);
+      
+      if (refreshToken) {
+        state.refreshToken = refreshToken;
+        localStorage.setItem('refreshToken', refreshToken);
+      }
     },
   },
   extraReducers: (builder) => {
@@ -110,6 +130,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
+        state.refreshToken = action.payload.refreshToken;
         state.isSuccess = true;
         state.error = null;
       })
@@ -117,27 +138,30 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.user = null;
+        state.accessToken = null;
+        state.refreshToken = null;
         state.isSuccess = false;
       })
+      // Update Password
       .addCase(updatePassword.pending, (state) => {
         state.passwordUpdateLoading = true;
         state.passwordUpdateError = null;
         state.passwordUpdateSuccess = false;
       })
-      .addCase(updatePassword.fulfilled, (state, action) => {
+      .addCase(updatePassword.fulfilled, (state) => {
         state.passwordUpdateLoading = false;
         state.passwordUpdateSuccess = true;
         state.passwordUpdateError = null;
-        const storedUser = JSON.parse(localStorage.getItem("user")) || {};
-        storedUser.updatePassword = true;
-        localStorage.setItem("user", JSON.stringify(storedUser));
-     
+        
+        if (state.user) {
+          state.user.updatePassword = true;
+          localStorage.setItem("user", JSON.stringify(state.user));
+        }
       })
       .addCase(updatePassword.rejected, (state, action) => {
         state.passwordUpdateLoading = false;
         state.passwordUpdateError = action.payload;
         state.passwordUpdateSuccess = false;
-
       })
       // Logout
       .addCase(logoutUser.pending, (state) => {
@@ -145,18 +169,20 @@ const authSlice = createSlice({
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
-        state.accessToken = '';
+        state.accessToken = null;
+        state.refreshToken = null;
         state.loading = false;
         state.isSuccess = false;
         state.error = null;
       })
       .addCase(logoutUser.rejected, (state) => {
         state.user = null;
+        state.accessToken = null;
+        state.refreshToken = null;
         state.loading = false;
         state.isSuccess = false;
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("user");
       })
+      // External profile updates sync
       .addCase(updateDoctor.fulfilled, (state, action) => {
         state.user = action.payload.user; 
         localStorage.setItem('user', JSON.stringify(action.payload.user));
@@ -164,6 +190,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError,  clearPasswordUpdate,refreshAccessToken } = authSlice.actions;
+export const { logout, clearError, clearPasswordUpdate, refreshAccessToken } = authSlice.actions;
 
 export default authSlice.reducer;

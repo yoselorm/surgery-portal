@@ -6,6 +6,8 @@ import {
   Eye,
   Calendar,
   Clock,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import SurgeryTypeModal from '../components/SurgeryTypeModal';
 import { useNavigate } from 'react-router-dom';
@@ -17,19 +19,56 @@ const SurgeryRecords = () => {
   const [showModal, setShowModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  // 1. Correctly pull state from 'state.surgery' matching our slice definition
+  const { 
+    surgeries, 
+    loading, 
+    currentPage, 
+    totalPages, 
+    totalSurgeriesCount 
+  } = useSelector((state) => state.surgeries);
+
+  // Simple debounce logic to prevent hitting the backend on every single keystroke
   useEffect(() => {
-    dispatch(fetchSurgeries());
-  }, [dispatch]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // 2. Fetch data from backend when filters, search terms, or pages update
+  useEffect(() => {
+    const queryParams = {
+      page: currentPage,
+      limit: 10,
+      // If search is active or filter status isn't 'all', pass them to req.query
+      status: filterStatus === 'all' ? undefined : filterStatus,
+      procedure: debouncedSearch || undefined 
+    };
+
+    dispatch(fetchSurgeries(queryParams));
+  }, [dispatch, currentPage, filterStatus, debouncedSearch]);
+
+  // Handle page switches cleanly
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      dispatch(fetchSurgeries({
+        page: newPage,
+        limit: 10,
+        status: filterStatus === 'all' ? undefined : filterStatus,
+        procedure: debouncedSearch || undefined
+      }));
+    }
+  };
 
   const handleSelectSurgery = (surgeryType) => {
     navigate(surgeryType.route);
   };
-
-  const { surgeries,loading } = useSelector((state) => state.surgeries);
 
   const handleExport = () => {
     exportToCSV(surgeries, "all_surgery_records.csv");
@@ -37,6 +76,7 @@ const SurgeryRecords = () => {
 
   // Format date helper
   const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { 
       year: 'numeric', 
@@ -47,6 +87,7 @@ const SurgeryRecords = () => {
 
   // Format time helper
   const formatTime = (dateString) => {
+    if (!dateString) return 'N/A';
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US', { 
       hour: '2-digit', 
@@ -73,21 +114,6 @@ const SurgeryRecords = () => {
     }
   };
 
-  const filteredRecords = surgeries
-    ?.filter((r) => {
-      const term = searchTerm?.toLowerCase();
-      return (
-        r.surgeryId?.toLowerCase().includes(term) ||
-        r.patientName?.toLowerCase().includes(term) ||
-        r.procedure?.toLowerCase().includes(term)
-      );
-    })
-    .filter((r) =>
-      filterStatus === "all"
-        ? true
-        : r.status?.toLowerCase() === filterStatus.toLowerCase()
-    );
-
   const getStatusBadge = (status) => {
     const color = getStatusColor(status);
     const colors = {
@@ -104,6 +130,7 @@ const SurgeryRecords = () => {
       </span>
     );
   };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-64 space-y-4">
@@ -112,6 +139,7 @@ const SurgeryRecords = () => {
       </div>
     );
   }
+
   return (
     <div className="p-6 space-y-6">
       {/* Surgery Type Modal */}
@@ -144,7 +172,7 @@ const SurgeryRecords = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search by patient name, procedure, or ID..."
+              placeholder="Search by procedure..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
@@ -154,7 +182,10 @@ const SurgeryRecords = () => {
           {/* Status Filter */}
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => {
+              setFilterStatus(e.target.value);
+              handlePageChange(1); // Reset back to page 1 on filter alteration
+            }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
           >
             <option value="all">All Status</option>
@@ -180,34 +211,20 @@ const SurgeryRecords = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Record ID
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Patient
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Procedure
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Type
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Date & Time
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                  Actions
-                </th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Record ID</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Patient</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Procedure</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date & Time</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredRecords?.map((record) => (
+              {surgeries?.map((record) => (
                 <tr key={record._id} className="hover:bg-gray-50 transition">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="font-semibold text-cyan-600">{record.surgeryId}</span>
+                    <span className="font-semibold text-cyan-600">{record.surgeryId || 'N/A'}</span>
                   </td>
                   <td className="px-6 py-4">
                     <div>
@@ -250,16 +267,13 @@ const SurgeryRecords = () => {
                 </tr>
               ))}
 
-              {filteredRecords?.length === 0 && (
+              {surgeries?.length === 0 && (
                 <tr>
-                  <td
-                    colSpan="7"
-                    className="text-center py-12 text-gray-500"
-                  >
+                  <td colSpan="7" className="text-center py-12 text-gray-500">
                     <div className="flex flex-col items-center space-y-2">
                       <Search className="w-12 h-12 text-gray-300" />
                       <p className="font-medium">No records found</p>
-                      <p className="text-sm">Try adjusting your search or filters</p>
+                      <p className="text-sm">Try adjusting your search filters</p>
                     </div>
                   </td>
                 </tr>
@@ -268,21 +282,33 @@ const SurgeryRecords = () => {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Dynamic Pagination Bar */}
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            Showing <span className="font-semibold">1-{Math.min(filteredRecords?.length || 0, 10)}</span> of{' '}
-            <span className="font-semibold">{filteredRecords?.length || 0}</span> records
+            Showing Page <span className="font-semibold">{currentPage}</span> of{' '}
+            <span className="font-semibold">{totalPages}</span> ({totalSurgeriesCount} total records)
           </p>
-          <div className="flex space-x-2">
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white transition text-sm font-medium">
+          <div className="flex items-center space-x-2">
+            <button 
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed text-gray-700"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
               Previous
             </button>
-            <button className="px-4 py-2 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition text-sm font-medium">
-              1
-            </button>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-white transition text-sm font-medium">
+            
+            <div className="text-sm font-semibold text-gray-700 px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg">
+              {currentPage} / {totalPages}
+            </div>
+
+            <button 
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages || totalPages === 0}
+              className="flex items-center px-3 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed text-gray-700"
+            >
               Next
+              <ChevronRight className="w-4 h-4 ml-1" />
             </button>
           </div>
         </div>
