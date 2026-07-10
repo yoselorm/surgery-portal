@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { ArrowLeft, Activity, Save, Send } from 'lucide-react';
@@ -28,8 +28,8 @@ const BiolitecLaserLHPForm = ({
   showDraft = true,
   disabled = false,
   showBackButton = true,
-  surgeryStatus = null, // New prop to track status
-  onSaveFollowUps = null, // New prop for follow-up save handler
+  surgeryStatus = null,
+  onSaveFollowUps = null,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -39,10 +39,11 @@ const BiolitecLaserLHPForm = ({
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
   const { id } = useParams();
 
+  const patientInfoRef = useRef(null);
+
   const isEditMode = !!externalFormData;
   const loading = isEditMode ? externalLoading : reduxLoading;
-  
-  // Get current status (from prop or currentSurgery)
+
   const currentStatus = surgeryStatus || currentSurgery?.status;
 
   const [badge, setBadge] = useState({
@@ -58,7 +59,6 @@ const BiolitecLaserLHPForm = ({
     }, timeout);
   };
 
-  // Internal form state (only used in create mode)
   const [internalFormData, setInternalFormData] = useState({
     date: '',
     patientName: '',
@@ -109,51 +109,65 @@ const BiolitecLaserLHPForm = ({
     },
     vasScore: '',
     followUp: {
-      twoWeeks: {
-        completed: false, date: '', vasScore: '', notes: '', symptoms: {
-          pain: '', itching: '', bleeding: '', soiling: '', prolapsing: ''
-        },
-      },
-      sixWeeks: {
-        completed: false, date: '', vasScore: '', notes: '', symptoms: {
-          pain: '', itching: '', bleeding: '', soiling: '', prolapsing: ''
-        },
-      },
-      threeMonths: {
-        completed: false, date: '', vasScore: '', notes: '', symptoms: {
-          pain: '', itching: '', bleeding: '', soiling: '', prolapsing: ''
-        },
-      },
-      sixMonths: {
-        completed: false, date: '', vasScore: '', notes: '', symptoms: {
-          pain: '', itching: '', bleeding: '', soiling: '', prolapsing: ''
-        },
-      },
-      twelveMonths: {
-        completed: false, date: '', vasScore: '', notes: '', symptoms: {
-          pain: '', itching: '', bleeding: '', soiling: '', prolapsing: ''
-        },
-      },
-      twoYears: {
-        completed: false, date: '', vasScore: '', notes: '', symptoms: {
-          pain: '', itching: '', bleeding: '', soiling: '', prolapsing: ''
-        },
-      },
-      threeYears: {
-        completed: false, date: '', vasScore: '', notes: '', symptoms: {
-          pain: '', itching: '', bleeding: '', soiling: '', prolapsing: ''
-        },
-      },
-      fiveYears: {
-        completed: false, date: '', vasScore: '', notes: '', symptoms: {
-          pain: '', itching: '', bleeding: '', soiling: '', prolapsing: ''
-        },
-      }
+      twoWeeks: { completed: false, date: '', vasScore: '', notes: '', symptoms: { pain: '', itching: '', bleeding: '', soiling: '', prolapsing: '' } },
+      sixWeeks: { completed: false, date: '', vasScore: '', notes: '', symptoms: { pain: '', itching: '', bleeding: '', soiling: '', prolapsing: '' } },
+      threeMonths: { completed: false, date: '', vasScore: '', notes: '', symptoms: { pain: '', itching: '', bleeding: '', soiling: '', prolapsing: '' } },
+      sixMonths: { completed: false, date: '', vasScore: '', notes: '', symptoms: { pain: '', itching: '', bleeding: '', soiling: '', prolapsing: '' } },
+      twelveMonths: { completed: false, date: '', vasScore: '', notes: '', symptoms: { pain: '', itching: '', bleeding: '', soiling: '', prolapsing: '' } },
+      twoYears: { completed: false, date: '', vasScore: '', notes: '', symptoms: { pain: '', itching: '', bleeding: '', soiling: '', prolapsing: '' } },
+      threeYears: { completed: false, date: '', vasScore: '', notes: '', symptoms: { pain: '', itching: '', bleeding: '', soiling: '', prolapsing: '' } },
+      fiveYears: { completed: false, date: '', vasScore: '', notes: '', symptoms: { pain: '', itching: '', bleeding: '', soiling: '', prolapsing: '' } }
     }
   });
 
   const formData = isEditMode ? externalFormData : internalFormData;
   const setFormData = isEditMode ? externalSetFormData : setInternalFormData;
+
+  // ── Validation ──────────────────────────────────────────────────────────────
+  // Mirrors the required fields on the Surgery mongoose schema:
+  // patientName, patientAge (0-150), gender (male/female), date
+  const getMissingRequiredFields = () => {
+    const missing = [];
+
+    if (!formData.patientName?.trim()) missing.push('Patient Name');
+
+    const ageNum = Number(formData.patientAge);
+    if (formData.patientAge === '' || formData.patientAge === null || formData.patientAge === undefined) {
+      missing.push('Patient Age');
+    } else if (isNaN(ageNum) || ageNum < 0 || ageNum > 150) {
+      missing.push('Patient Age (must be a valid number between 0 and 150)');
+    }
+
+    if (!formData.gender) missing.push('Gender');
+    if (!formData.date) missing.push('Date');
+
+    return missing;
+  };
+
+  const runValidationOrWarn = () => {
+    const missing = getMissingRequiredFields();
+    if (missing.length > 0) {
+      toast.warning(
+        `Please fill in the following before continuing: ${missing.join(', ')}`
+      );
+      patientInfoRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return false;
+    }
+    return true;
+  };
+
+  // Gate each confirmation modal behind validation
+  const attemptOpenSubmitModal = () => {
+    if (runValidationOrWarn()) setIsSubmitModalOpen(true);
+  };
+
+  const attemptOpenDraftModal = () => {
+    if (runValidationOrWarn()) setIsDraftModalOpen(true);
+  };
+
+  const attemptOpenCompleteModal = () => {
+    if (runValidationOrWarn()) setIsModalOpen(true);
+  };
 
   const handleSubmit = async () => {
     if (isEditMode && externalOnSubmit) {
@@ -202,7 +216,7 @@ const BiolitecLaserLHPForm = ({
       date,
       ...clinicalFormData
     } = formData;
-  
+
     const payload = {
       patientName,
       patientAge: patientAge ? Number(patientAge) : null,
@@ -217,14 +231,14 @@ const BiolitecLaserLHPForm = ({
       }),
       formData: clinicalFormData,
     };
-  
+
     try {
       if (id) {
         await dispatch(updateSurgery({ id, data: payload })).unwrap();
       } else {
         await dispatch(createSurgery(payload)).unwrap();
       }
-    
+
       toast.success('Surgery record saved as draft successfully');
       navigate(-1)
     } catch (err) {
@@ -234,16 +248,14 @@ const BiolitecLaserLHPForm = ({
         'Failed to save surgery record'
       );
     }
-    
   };
-  
 
   const handleSaveAsCompleted = async () => {
     if (currentStatus === 'complete') {
       showBadge('error', 'Already completed');
       return;
     }
-    
+
     try {
       const {
         patientName,
@@ -294,7 +306,6 @@ const BiolitecLaserLHPForm = ({
     });
   };
 
-  // Determine which buttons to show based on status
   const shouldShowDraftButton = !isEditMode || currentStatus === 'draft';
   const shouldShowCompleteButton = isEditMode && (currentStatus === 'draft' || currentStatus === 'follow-ups');
   const shouldShowSubmitButton = !isEditMode || currentStatus === 'draft';
@@ -315,7 +326,6 @@ const BiolitecLaserLHPForm = ({
         <FormHeader />
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 space-y-8">
-          {/* Status indicator for edit mode */}
           {isEditMode && currentStatus && (
             <div className={`p-4 rounded-lg border ${
               currentStatus === 'complete' ? 'bg-red-50 border-red-200' :
@@ -336,11 +346,13 @@ const BiolitecLaserLHPForm = ({
             disabled={disabled}
           />
 
-          <PatientInfoSection
-            formData={formData}
-            onInputChange={handleInputChange}
-            disabled={disabled}
-          />
+          <div ref={patientInfoRef}>
+            <PatientInfoSection
+              formData={formData}
+              onInputChange={handleInputChange}
+              disabled={disabled}
+            />
+          </div>
 
           <ClinicalPresentationSection
             formData={formData}
@@ -390,11 +402,10 @@ const BiolitecLaserLHPForm = ({
             disabled={disabled}
           />
 
-          {/* Save as Draft button - only for create mode or draft status */}
           {shouldShowDraftButton && (
             <button
               type="button"
-              onClick={() => setIsDraftModalOpen(true)}
+              onClick={attemptOpenDraftModal}
               className="flex items-center space-x-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold"
             >
               <Save className="w-5 h-5" />
@@ -425,13 +436,11 @@ const BiolitecLaserLHPForm = ({
             </div>
           )}
 
-          {/* Action Buttons */}
           <div className="pt-8 border-t border-gray-200 flex items-center justify-between">
-            {/* Save as Completed button - only for draft or follow-ups status */}
             {shouldShowCompleteButton && (
               <button
                 type="button"
-                onClick={() => setIsModalOpen(true)}
+                onClick={attemptOpenCompleteModal}
                 className="flex items-center space-x-2 px-6 py-3 border-2 border-green-300 text-green-700 rounded-lg hover:bg-green-50 transition font-semibold"
               >
                 <Save className="w-5 h-5" />
@@ -439,11 +448,10 @@ const BiolitecLaserLHPForm = ({
               </button>
             )}
 
-            {/* Submit/Update button - only for create mode or draft status */}
             {shouldShowSubmitButton && (
               <button
                 type="submit"
-                onClick={() => setIsSubmitModalOpen(true)}
+                onClick={attemptOpenSubmitModal}
                 className={`flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 text-white rounded-lg hover:from-cyan-700 hover:to-blue-700 transition font-semibold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${!shouldShowCompleteButton ? 'ml-auto' : ''}`}
               >
                 <Send className="w-5 h-5" />
